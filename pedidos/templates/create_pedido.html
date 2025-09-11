@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1 class="text-center text-uppercase"><ion-icon name="clipboard-outline"></ion-icon>Crear Pedidos</h1>
+
+  {{error}}
+  <form action="/crear_pedidos/" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="p-2">
+      {{form}}
+    </div>  
+    <div class="p-2">
+      {{ imagen_formset }}
+    </div>
+    <!-- Campo para subir múltiples imágenes -->
+    <div class="form-group">
+      <label>Imágenes:</label>
+      {{ imagen_formset.imagen }}
+    </div>
+    <!-- Contenedor para previsualización -->
+    <div id="preview" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
+    <div class="table-responsive p-2">
+      <table id ="detalle-table" class="table-primary table-bordered">
+      {{ formset.management_form }}
+      {% for f in formset %}
+        <thead>
+          <tr>
+            <th>{{ f.nombre.label_tag }}</th>
+            <th>{{ f.talle.label_tag }}</th>
+            <th>{{ f.dorsal.label_tag }}</th>
+            <th>{{ f.molde.label_tag }}</th>
+            <th>{{ f.cuello_tipo.label_tag }}</th>
+            <th>{{ f.cuello_color.label_tag }}</th>
+            <th>{{ f.observacion.label_tag }}</th>
+            <th>{{ f.calidad.label_tag }}</th>
+            <th>{{ f.cantidad.label_tag }}</th>
+          </tr>
+        </thead>
+        <tbody id = "formset-body">        
+        <tr class="formset-row">
+          <td>{{ f.nombre }}</td>
+          <td>{{ f.talle }}</td>
+          <td>{{ f.dorsal }}</td>
+          <td>{{ f.molde }}</td>
+          <td>{{ f.cuello_tipo }}</td>
+          <td>{{ f.cuello_color }}</td>
+          <td>{{ f.observacion }}</td>
+          <td>{{ f.calidad }}</td>
+          <td>{{ f.cantidad }}</td>
+          <td><button type="button" class="remove-row">❌</button></td>
+        </tr>
+        </tbody>
+      {% endfor %}
+      </table>
+
+      <!-- Form vacío oculto -->
+      <template id="empty-form">
+        <tr class="formset-row">
+          <td>{{ formset.empty_form.nombre }}</td>
+          <td>{{ formset.empty_form.talle }}</td>
+          <td>{{ formset.empty_form.dorsal }}</td>
+          <td>{{ formset.empty_form.molde }}</td>
+          <td>{{ formset.empty_form.cuello_tipo }}</td>
+          <td>{{ formset.empty_form.cuello_color }}</td>
+          <td>{{ formset.empty_form.observacion }}</td>
+          <td>{{ formset.empty_form.calidad }}</td>
+          <td>{{ formset.empty_form.cantidad }}</td>        
+          <td><button type="button" class="remove-row">❌</button></td>
+        </tr>
+      </template>      
+    </div>
+    <button type="button" class="btn btn-secondary" id="add-form"><ion-icon name="add-circle-outline"></ion-icon> Agregar detalle</button>
+    <button class="btn btn-primary"><ion-icon name="save-outline"></ion-icon> Grabar</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+  let formsetBody = document.getElementById("formset-body");
+  let addButton = document.getElementById("add-form");
+  let emptyForm = document.getElementById("empty-form").innerHTML;
+  let totalForms = document.getElementById("id_detalles-TOTAL_FORMS");
+  
+  const previewContainer = document.getElementById('preview');
+  
+  // Agregar nueva fila
+  addButton.addEventListener("click", function() {
+    let formIndex = totalForms.value;
+    //console.log(emptyForm)
+    let newRow = emptyForm.replace(/__prefix__/g, formIndex);
+    console.log(newRow)
+    formsetBody.insertAdjacentHTML("beforeend", newRow);
+    totalForms.value = parseInt(formIndex) + 1;
+  });
+
+  // Eliminar fila
+  formsetBody.addEventListener("click", function(e) {
+    if (e.target.classList.contains("remove-row")) {
+      e.target.closest("tr").remove();
+      // 👇 Ojo: Django necesita que TOTAL_FORMS refleje solo los forms que envías.
+      // Si borras dinámicamente, tendrías que ajustar más la lógica
+      // (ejemplo: marcar "DELETE" en lugar de quitar completamente la fila).
+    }
+  });
+
+  function mostrarVistaPrevia(inputId){    
+    const input = document.getElementById(inputId);
+
+    input.addEventListener('change', function () {
+      previewContainer.innerHTML = ''; // Limpiar vista previa anterior
+      const files = input.files;
+
+      if (files.length > 0) {
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.height = '100px';
+                    img.style.border = '1px solid #ccc';
+                    img.style.borderRadius = '4px';
+                    img.style.padding = '4px';
+                    previewContainer.appendChild(img);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+      }
+    });
+  }  
+  mostrarVistaPrevia('id_detalles_imagen-0-imagen')
+  mostrarVistaPrevia('id_detalles_imagen-1-imagen')
+  mostrarVistaPrevia('id_detalles_imagen-2-imagen')
+});
+</script>
+{% endblock %}
