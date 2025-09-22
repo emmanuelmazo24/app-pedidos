@@ -1,10 +1,10 @@
 import os
-import django
+#import django
 from django.contrib.auth.models import User
 
 # Configurar el entorno de Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myapp.settings')
-django.setup()
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myapp.settings')
+# django.setup()
 
 # Datos del superusuario
 SUPERUSER_USERNAME = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
