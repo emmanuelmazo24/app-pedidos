@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="container">
+  <div class="row">
+    <div class="col-md-4 offset-md-4 mt-5">
+      <form action="/signin/" method="POST" class="card card-body">
+        <h1 class="text-center">Inicio de Sesión</h1>
+
+        <p>
+        {{error}}
+        </p>
+
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="usuario">Usuario</label>
+          <input type="text" class="form-control" id="username" placeholder="Ingrese Usuario" name="username">
+        </div>
+        <div class="mb-3">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password" placeholder="Ingrese Contraseña" name="password">
+        </div>    
+        <button class="btn btn-primary mb-3" type="submit">
+          Iniciar Sesión
+        </button>
+      </form>
+    </div>
+  </div>  
+</main>
+{% endblock %}

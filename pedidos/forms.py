@@ -5,12 +5,20 @@ from .models import Pedidos, Pedidos_detalle, Pedidos_imagen
 class PedidosForm(ModelForm):
     class Meta:
         model = Pedidos
-        fields = ['nombre', 'contacto', 'telefono', 'descripcion']
+        fields = ['nombre', 'contacto', 'telefono', 'total','descripcion','img_jugadores','img_arquero','img_auspicio1','img_auspicio2','img_auspicio3','img_auspicio4','img_auspicio5']
         labels = {
         'nombre': 'Pedido',
         'contacto': 'Contacto',
         'telefono': 'Teléfono',
         'descripcion': 'Descripción',
+        'total': 'Total',
+        'img_jugadores': 'Diseño Jugadores',
+        'img_arquero': 'Diseño Arquero',
+        'img_auspicio1': 'Auspiciante 1',
+        'img_auspicio2': 'Auspiciante 2',
+        'img_auspicio3': 'Auspiciante 3',
+        'img_auspicio4': 'Auspiciante 4',
+        'img_auspicio5': 'Auspiciante 5',
         }
         # help_texts = {
         #     'telefono': 'Ingrese un número de teléfono válido.',
@@ -32,9 +40,44 @@ class PedidosForm(ModelForm):
                   'descripcion': forms.Textarea(attrs={
                       'class': 'form-control',
                       'placeholder': 'Indique alguna descripcion del pedido',
-                      'rows': 4,
-                  }),}
-        
+                      'rows': 4,                      
+                  }),
+                  'total': forms.NumberInput(attrs={'readonly': 'readonly', 
+                      'class': 'form-control'
+                        }),
+                  'img_jugadores': forms.ClearableFileInput(attrs={
+                      'class': 'form-control',  
+                      }),
+                  'img_arquero': forms.ClearableFileInput(attrs={
+                      'class': 'form-control',  
+                      }),
+                  'img_auspicio1': forms.ClearableFileInput(attrs={
+                      'class': 'form-control',
+                      }),
+                  'img_auspicio2': forms.ClearableFileInput(attrs={
+                      'class': 'form-control',
+                      }),
+                  'img_auspicio3': forms.ClearableFileInput(attrs={
+                      'class': 'form-control',
+                      }),
+                  'img_auspicio4': forms.ClearableFileInput(attrs={
+                      'class': 'form-control',  
+                      }),
+                  'img_auspicio5': forms.ClearableFileInput(attrs={
+                      'class': 'form-control',
+                      })
+                }
+    # def __init__(self, *args, **kwargs):
+    #   super().__init__(*args, **kwargs)
+    #   for field in self.fields.values():
+    #     field.label_suffix = ''
+    #     if 'class' in field.widget.attrs:
+    #         field.widget.attrs['class'] += ' form-control'
+    #         field.label = field.label_tag(attrs={'class': ' form-label'})
+    #     else:
+    #         field.widget.attrs['class'] = 'form-control'
+    #         field.label = field.label_tag(attrs={'class': 'form-label'})          
+
 class PedidoImagenForm(ModelForm):
     class Meta:
         model = Pedidos_imagen
@@ -47,7 +90,7 @@ class PedidoImagenForm(ModelForm):
 class PedidosDetalleForm(ModelForm):    
     class Meta:
       model = Pedidos_detalle
-      fields = ['nombre', 'talle', 'dorsal', 'molde', 'cuello_tipo', 'cuello_color', 'observacion', 'calidad', 'cantidad']
+      fields = ['id','nombre', 'talle', 'dorsal', 'molde', 'cuello_tipo', 'cuello_color', 'observacion', 'indumentaria','calidad', 'cantidad','precio_aprobado']
       labels = {
           'nombre': 'Nombre',
           'talle': 'Talle',
@@ -56,13 +99,20 @@ class PedidosDetalleForm(ModelForm):
           'cuello_tipo': 'Tipo de Cuello',
           'cuello_color': 'Color del Cuello',
           'observacion': 'Observaciones',
+          'indumentaria': 'Indumentaria',
           'calidad': 'Calidad',
-          'cantidad': 'Cantidad',            
+          'cantidad': 'Cantidad',
+          'precio_aprobado': 'Precio',          
       }
       
       widgets = { 'molde': forms.Select(),
+                 'talle': forms.Select(),
                  'cuello_tipo': forms.Select(),
-                 'calidad': forms.Select(),}
+                 'calidad': forms.Select(),
+                 'indumentaria': forms.Select(),
+                 'cantidad': forms.NumberInput(attrs={'readonly': 'readonly'}),
+                 'precio_aprobado': forms.NumberInput(attrs={'readonly': 'readonly'}),
+                 'id': forms.HiddenInput()}
         
 
 # Inline Formset: permite manejar cabecera + detalle
@@ -71,6 +121,14 @@ DetallePedidosFormSet = inlineformset_factory(
     Pedidos_detalle,
     form=PedidosDetalleForm,
     extra=1,           # cuántos formularios vacíos aparecen
+    can_delete=False    # permitir eliminar detalles
+)
+
+DetallePedidosEdFormSet = inlineformset_factory(
+    Pedidos,
+    Pedidos_detalle,
+    form=PedidosDetalleForm,
+    extra=0,           # cuántos formularios vacíos aparecen
     can_delete=True    # permitir eliminar detalles
 )
 
@@ -78,6 +136,6 @@ ImagenPedidosFormSet = inlineformset_factory(
     Pedidos,
     Pedidos_imagen,
     form=PedidoImagenForm,
-    extra=3,           # cuántos formularios vacíos aparecen
+    extra=1,           # cuántos formularios vacíos aparecen
     can_delete=False    # permitir eliminar detalles
 )

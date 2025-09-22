@@ -411,3 +411,148 @@
 #     inlines = [ImagenPedidoInline]
 
 # admin.site.register(Pedidos_detalle, PedidosDetalleAdmin)
+
+
+# @login_required
+# def pedidos_pdf_view(request, pedido_id):
+#     pedidos = get_object_or_404(Pedidos, pk=pedido_id)
+#     pedidos_detalle = Pedidos_detalle.objects.filter(pedido=pedidos)
+#     pedidos_imagen = Pedidos_imagen.objects.filter(pedido=pedidos)
+
+#     # Traer el precio según calidad e indumentaria para cada detalle
+#     for detalle in pedidos_detalle:
+#         try:
+#             precio_obj = PrecioIndumentaria.objects.get(
+#                 calidad=detalle.calidad,
+#                 indumentaria=detalle.indumentaria
+#             )
+#             detalle.precio_aprobado = precio_obj.precio
+#         except PrecioIndumentaria.DoesNotExist:
+#             detalle.precio_aprobado = 0  # O el valor que desees por defecto
+
+#     total_montos = sum([d.precio_aprobado * d.cantidad for d in pedidos_detalle])
+
+#     for img in pedidos_imagen:
+#         img.imagen_url = request.build_absolute_uri(img.imagen.url)
+
+#     context = {
+#         "pedidos": pedidos,
+#         "pedidos_detalle": pedidos_detalle,
+#         "pedidos_imagen": pedidos_imagen,
+#         "total_montos": total_montos,
+#     }
+#     return render_to_pdf('pedido_pdf_template.html', context)
+
+
+
+# models.py
+
+# from django.db import models
+
+# class Factura(models.Model):
+#     cliente = models.CharField(max_length=100)
+#     fecha = models.DateField()
+#     total = models.DecimalField(max_digits=10, decimal_places=2)
+
+# class LineaFactura(models.Model):
+#     factura = models.ForeignKey(Factura, related_name='lineas', on_delete=models.CASCADE)
+#     producto = models.CharField(max_length=100)
+#     cantidad = models.IntegerField()
+#     precio = models.DecimalField(max_digits=10, decimal_places=2)
+# 🧾 Formulario HTML (ejemplo simplificado)
+# Tu formulario HTML enviaría los datos de la cabecera y las líneas así:
+
+# html
+# Copiar código
+# <form method="post">
+#   {% csrf_token %}
+
+#   <!-- Cabecera -->
+#   <input type="text" name="cliente" value="{{ factura.cliente }}">
+#   <input type="date" name="fecha" value="{{ factura.fecha }}">
+#   <input type="text" name="total" value="{{ factura.total }}">
+
+#   <!-- Detalle (líneas) -->
+#   {% for linea in factura.lineas.all %}
+#     <input type="hidden" name="linea_id" value="{{ linea.id }}">
+#     <input type="text" name="producto" value="{{ linea.producto }}">
+#     <input type="number" name="cantidad" value="{{ linea.cantidad }}">
+#     <input type="text" name="precio" value="{{ linea.precio }}">
+#   {% endfor %}
+
+#   <!-- Puedes agregar campos vacíos para nuevas líneas también -->
+
+#   <button type="submit">Actualizar</button>
+# </form>
+# Pero como eso se vuelve complejo, es mejor que los inputs del detalle se nombren como listas:
+
+# html
+# Copiar código
+# <input type="hidden" name="linea_id[]" value="1">
+# <input type="text" name="producto[]" value="Producto 1">
+# <input type="number" name="cantidad[]" value="2">
+# <input type="text" name="precio[]" value="10.00">
+# Así puedes manejar múltiples líneas en el backend.
+
+# 🧠 Vista basada en función (views.py)
+# python
+# Copiar código
+# from django.shortcuts import render, get_object_or_404, redirect
+# from .models import Factura, LineaFactura
+# from django.views.decorators.csrf import csrf_exempt  # solo para pruebas (no en producción)
+
+# @csrf_exempt  # elimina esto en producción, usa {% csrf_token %} en el template
+# def actualizar_factura(request, factura_id):
+#     factura = get_object_or_404(Factura, id=factura_id)
+
+#     if request.method == 'POST':
+#         # 1. Actualizar cabecera
+#         factura.cliente = request.POST.get('cliente')
+#         factura.fecha = request.POST.get('fecha')
+#         factura.total = request.POST.get('total')
+#         factura.save()
+
+#         # 2. Leer datos del detalle
+#         ids = request.POST.getlist('linea_id[]')         # IDs existentes (pueden venir vacíos)
+#         productos = request.POST.getlist('producto[]')   # Lista de productos
+#         cantidades = request.POST.getlist('cantidad[]')
+#         precios = request.POST.getlist('precio[]')
+
+#         lineas_actualizadas = []
+
+#         for i in range(len(productos)):
+#             linea_id = ids[i] if i < len(ids) else None
+#             producto = productos[i]
+#             cantidad = cantidades[i]
+#             precio = precios[i]
+
+#             if linea_id:
+#                 # Línea existente: actualizar
+#                 try:
+#                     linea = LineaFactura.objects.get(id=linea_id, factura=factura)
+#                     linea.producto = producto
+#                     linea.cantidad = cantidad
+#                     linea.precio = precio
+#                     linea.save()
+#                     lineas_actualizadas.append(linea.id)
+#                 except LineaFactura.DoesNotExist:
+#                     continue
+#             else:
+#                 # Nueva línea
+#                 nueva = LineaFactura.objects.create(
+#                     factura=factura,
+#                     producto=producto,
+#                     cantidad=cantidad,
+#                     precio=precio
+#                 )
+#                 lineas_actualizadas.append(nueva.id)
+
+#         # 3. Eliminar líneas que ya no están
+#         for linea in factura.lineas.all():
+#             if linea.id not in lineas_actualizadas:
+#                 linea.delete()
+
+#         return redirect('factura_detalle', factura_id=factura.id)  # o donde quieras redirigir
+
+#     # Si GET, renderizas el formulario con datos actuales
+#     return render(request, 'factura_form.html', {'factura': factura})

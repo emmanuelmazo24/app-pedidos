@@ -1,44 +1,55 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="container">
   <h1 class="text-center text-uppercase"><ion-icon name="clipboard-outline"></ion-icon>Crear Pedidos</h1>
 
   {{error}}
   <form action="/crear_pedidos/" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="p-2">
-      {{form}}
-    </div>  
-    <div class="p-2">
-      {{ imagen_formset }}
-    </div>
-    <!-- Campo para subir múltiples imágenes -->
-    <div class="form-group">
-      <label>Imágenes:</label>
-      {{ imagen_formset.imagen }}
-    </div>
+    {% csrf_token %}    
+    <div class="row g-3">
+      {% for field in form %}
+        <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.errors %}
+            <div class="text-danger">{{ field.errors }}</div>
+          {% endif %}
+        </div>             
+      {% endfor %}
+    </div>         
     <!-- Contenedor para previsualización -->
-    <div id="preview" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
+    <div id="preview" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <img id = "id_img_jugadores_vp" src="" alt="Imagen Jugadores" style="display: none; height: 100px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+      <img id = "id_img_arquero_vp" src="" alt="Imagen Arquero" style="display: none; height: 100px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+      <img id = "id_img_auspicio1_vp" src="" alt="Imagen auspicio 1" style="display: none; height: 100px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+      <img id = "id_img_auspicio2_vp" src="" alt="Imagen auspicio 2" style="display: none; height: 100px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+      <img id = "id_img_auspicio3_vp" src="" alt="Imagen auspicio 3" style="display: none; height: 100px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+      <img id = "id_img_auspicio4_vp" src="" alt="Imagen auspicio 4" style="display: none; height: 100px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+      <img id = "id_img_auspicio5_vp" src="" alt="Imagen auspicio 5" style="display: none; height: 100px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+    </div>
     <div class="table-responsive p-2">
       <table id ="detalle-table" class="table-primary table-bordered">
       {{ formset.management_form }}
       {% for f in formset %}
         <thead>
           <tr>
-            <th>{{ f.nombre.label_tag }}</th>
-            <th>{{ f.talle.label_tag }}</th>
-            <th>{{ f.dorsal.label_tag }}</th>
-            <th>{{ f.molde.label_tag }}</th>
-            <th>{{ f.cuello_tipo.label_tag }}</th>
-            <th>{{ f.cuello_color.label_tag }}</th>
-            <th>{{ f.observacion.label_tag }}</th>
-            <th>{{ f.calidad.label_tag }}</th>
-            <th>{{ f.cantidad.label_tag }}</th>
+            <th></th>
+            <th>{{ f.nombre.label|safe }}</th>
+            <th>{{ f.talle.label|safe }}</th>
+            <th>{{ f.dorsal.label|safe }}</th>
+            <th>{{ f.molde.label|safe }}</th>
+            <th>{{ f.cuello_tipo.label|safe }}</th>
+            <th>{{ f.cuello_color.label|safe }}</th>
+            <th>{{ f.observacion.label|safe }}</th>
+            <th>{{ f.indumentaria.label|safe }}</th>
+            <th>{{ f.calidad.label|safe }}</th>
+            <th>{{ f.cantidad.label|safe }}</th>
+            <th>{{ f.precio_aprobado.label|safe }}</th>
           </tr>
         </thead>
         <tbody id = "formset-body">        
         <tr class="formset-row">
+          <td>{{ f.id }}</td>
           <td>{{ f.nombre }}</td>
           <td>{{ f.talle }}</td>
           <td>{{ f.dorsal }}</td>
@@ -46,8 +57,10 @@
           <td>{{ f.cuello_tipo }}</td>
           <td>{{ f.cuello_color }}</td>
           <td>{{ f.observacion }}</td>
+          <td>{{ f.indumentaria }}</td>
           <td>{{ f.calidad }}</td>
           <td>{{ f.cantidad }}</td>
+          <td>{{ f.precio_aprobado }}</td>
           <td><button type="button" class="remove-row">❌</button></td>
         </tr>
         </tbody>
@@ -57,6 +70,7 @@
       <!-- Form vacío oculto -->
       <template id="empty-form">
         <tr class="formset-row">
+          <td>{{ formset.empty_form.id }}</td>
           <td>{{ formset.empty_form.nombre }}</td>
           <td>{{ formset.empty_form.talle }}</td>
           <td>{{ formset.empty_form.dorsal }}</td>
@@ -64,8 +78,10 @@
           <td>{{ formset.empty_form.cuello_tipo }}</td>
           <td>{{ formset.empty_form.cuello_color }}</td>
           <td>{{ formset.empty_form.observacion }}</td>
+          <td>{{ formset.empty_form.indumentaria }}</td>
           <td>{{ formset.empty_form.calidad }}</td>
-          <td>{{ formset.empty_form.cantidad }}</td>        
+          <td>{{ formset.empty_form.cantidad }}</td>
+          <td>{{ formset.empty_form.precio_aprobado }}</td>        
           <td><button type="button" class="remove-row">❌</button></td>
         </tr>
       </template>      
@@ -109,7 +125,7 @@
     const input = document.getElementById(inputId);
 
     input.addEventListener('change', function () {
-      previewContainer.innerHTML = ''; // Limpiar vista previa anterior
+      //previewContainer.innerHTML = ''; // Limpiar vista previa anterior
       const files = input.files;
 
       if (files.length > 0) {
@@ -118,13 +134,9 @@
                 const reader = new FileReader();
 
                 reader.onload = function (e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.height = '100px';
-                    img.style.border = '1px solid #ccc';
-                    img.style.borderRadius = '4px';
-                    img.style.padding = '4px';
-                    previewContainer.appendChild(img);
+                  const img = document.getElementById(inputId+'_vp');
+                  img.src = e.target.result;   
+                  img.style.display = 'block';                
                 };
 
                 reader.readAsDataURL(file);
@@ -133,9 +145,46 @@
       }
     });
   }  
-  mostrarVistaPrevia('id_detalles_imagen-0-imagen')
-  mostrarVistaPrevia('id_detalles_imagen-1-imagen')
-  mostrarVistaPrevia('id_detalles_imagen-2-imagen')
+
+  function actualizarPrecio(row) {
+    const indumentaria = row.querySelector('[name$="-indumentaria"]').value;
+    const calidad = row.querySelector('[name$="-calidad"]').value;
+    const precioInput = row.querySelector('[name$="-precio_aprobado"]');
+    if (indumentaria && calidad) {
+      fetch(`/obtener_precio/?indumentaria=${encodeURIComponent(indumentaria)}&calidad=${encodeURIComponent(calidad)}`)
+        .then(response => response.json())
+        .then(data => {          
+          const precioFormateado = parseFloat(data.precio).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          console.log(precioFormateado);
+          precioInput.value = data.precio;
+        });
+    }
+  }
+
+  // Para cada fila existente
+  document.querySelectorAll('.formset-row').forEach(row => {
+    const indumentariaSelect = row.querySelector('[name$="-indumentaria"]');
+    const calidadSelect = row.querySelector('[name$="-calidad"]');
+    if (indumentariaSelect && calidadSelect) {
+      indumentariaSelect.addEventListener('change', () => actualizarPrecio(row));
+      calidadSelect.addEventListener('change', () => actualizarPrecio(row));
+    }
+  });
+
+  // Para nuevas filas agregadas dinámicamente
+  document.getElementById("formset-body").addEventListener("change", function(e) {
+    if (e.target.name.endsWith('-indumentaria') || e.target.name.endsWith('-calidad')) {
+      const row = e.target.closest('.formset-row');
+      actualizarPrecio(row);
+    }
+  });
+  mostrarVistaPrevia('id_img_jugadores')
+  mostrarVistaPrevia('id_img_arquero')
+  mostrarVistaPrevia('id_img_auspicio1')
+  mostrarVistaPrevia('id_img_auspicio2')
+  mostrarVistaPrevia('id_img_auspicio3')
+  mostrarVistaPrevia('id_img_auspicio4')
+  mostrarVistaPrevia('id_img_auspicio5')
 });
 </script>
 {% endblock %}

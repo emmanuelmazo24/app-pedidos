@@ -1,0 +1,155 @@
+{% load static %}
+{% comment %} {% load custom_filters %} {% endcomment %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden de Pedido</title>    
+    <!-- <link rel="stylesheet" href="{% static 'pedidos/styles.css' %}"> -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .pedido-container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            color: #0056b3;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .totales {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        /* Estilos específicos para la impresión (cuando se guarda como PDF) */
+        @media print {
+            body {
+                /* Elimina el fondo y la sombra para una impresión limpia */
+                background-color: #fff;
+                padding: 0;
+                margin: 0;
+            }
+
+            .pedido-container {
+                box-shadow: none; /* Quita la sombra de la caja */
+            }
+
+            /* Oculta elementos que no se necesitan en el PDF */
+            /* Por ejemplo: botones, barras de navegación, etc. */
+            .no-imprimir {
+                display: none;
+            }
+
+            h1 {
+                color: #000 !important; /* Asegura que el color sea negro para la impresión */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pedido-container">
+        <header>
+            <h1>Orden de Pedido #{{pedidos.id}}</h1>
+            <div class="header-info">
+                <p><strong>Fecha:</strong> {{pedidos.fecha_creacion|date:"d/m/Y"}}</p>
+                <p><strong>Cliente:</strong> {{pedidos.user.username}}</p>
+                <p><strong>Contacto:</strong> {{pedidos.contacto}}</p>
+                <p><strong>Teléfono:</strong> {{pedidos.telefono}}</p>
+            </div>
+        </header>
+
+        <section class="detalle-pedido">
+            <h2>Detalles del Pedido</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Talle</th>
+                        <th>Nro Dorsal</th>
+                        <th>Molde</th>
+                        <th>T.Cuello</th>
+                        <th>Color Cuello</th>
+                        <th>Calidad</th>
+                        {% if total_montos > 0 %}  
+                        <th>Cantidad</th>
+                        <th>Precio Aprobado</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pedidos_detalle %}
+                    <tr>
+                        <td>{{item.nombre}}</td>
+                        <td>{{item.talle}}</td>
+                        <td>{{item.dorsal}}</td>
+                        <td>{{item.molde}}</td>
+                        <td>{{item.cuello_tipo}}</td>
+                        <td>{{item.cuello_color}}</td>
+                        <td>{{item.calidad}}</td>
+                        {% if total_montos > 0 %}  
+                        <th>{{item.cantidad}}</th>
+                        <th>{{item.precio_aprobado|intcomma}}</th>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}                    
+                </tbody>
+            </table>
+        </section>
+        <section class="imagenes-pedido">
+            <h2>Imágenes del Pedido</h2>
+            <div class="imagenes-grid">
+              <div class="imagen-item">                
+                <img src="{{pedidos.img_jugadores_url}}" alt="Imagen Jugadores" style="{% if not pedidos.img_jugadores %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+                <img src="{{pedidos.img_arquero_url}}" alt="Imagen Arquero" style="{% if not pedidos.img_arquero %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+                <img src="{{pedidos.img_auspicio1_url}}" alt="Imagen auspicio 1" style="{% if not pedidos.img_auspicio1 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+                <img src="{{pedidos.img_auspicio2_url}}" alt="Imagen auspicio 2" style="{% if not pedidos.img_auspicio2 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+                <img src="{{pedidos.img_auspicio3_url}}" alt="Imagen auspicio 3" style="{% if not pedidos.img_auspicio3 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+                <img src="{{pedidos.img_auspicio4_url}}" alt="Imagen auspicio 4" style="{% if not pedidos.img_auspicio4 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+                <img src="{{pedidos.img_auspicio5_url}}" alt="Imagen auspicio 5" style="{% if not pedidos.img_auspicio5 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+              </div>
+            </div>  
+        </section>  
+        {% if total_montos > 0 %}      
+        <footer>
+            <div class="totales">
+                <p><strong>Subtotal:</strong> $2,100.00</p>
+                <p><strong>IVA (16%):</strong> $336.00</p>
+                <h3><strong>TOTAL:</strong> Gs.{{ total_montos|intcomma  }}</h3>
+            </div>
+        </footer>
+        {% endif %}
+    </div>
+</body>
+</html>

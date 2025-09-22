@@ -3,5 +3,24 @@
 {% block content %}
 
 <h1>Lista Pedidos</h1>
-
+<ul>
+    {% for pedido in pedidos %}
+        <li>
+            <strong>Nro.Pedido: {{ pedido.id }}</strong> {{ pedido.nombre }} - {{ pedido.contacto }} - {{ pedido.telefono }}
+            <br>
+            <em>Creado por: {{ pedido.user.username }}</em>
+            <strong> Descargar PDF</strong>
+            <a href="{% url 'pedidos_pdf' pedido.id %}" target="_blank"><ion-icon name="download-outline" ></ion-icon></a> 
+            <!-- <strong> Ver Detalle</strong>
+            <a href="{% url 'pedidos_detalle' pedido.id %}"><ion-icon name="eye-outline" ></ion-icon></a>            -->
+            <strong> Estado: {{ pedido.estado }}</strong>
+            {% if pedido.estado == 'PENDIENTE' %}
+                <strong> Modificar</strong>
+                <a href="{% url 'pedidos_detalle' pedido.id %}"><ion-icon name="create-outline" ></ion-icon></a>           
+            {% endif %}	
+        </li>
+    {% empty %}
+        <li>No hay pedidos disponibles.</li>
+    {% endfor %}
+</ul>
 {% endblock %}

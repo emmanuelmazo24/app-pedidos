@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center text-uppercase"><ion-icon name="brush-outline"></ion-icon>Modificar Pedidos</h1>
+    <h3 class="text-center text-uppercase">Pedido Nro: {{pedido.id}}</h1>
+    {{error}}
+    <form action="{% url 'pedidos_detalle' pedido.id %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}    
+        <div class="row g-3">
+        {% for field in form %}
+            <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+                <div class="text-danger">{{ field.errors }}</div>
+            {% endif %}
+            </div>             
+        {% endfor %}
+        </div>         
+        <div class="table-responsive p-2">
+            <table id ="detalle-table" class="table-primary table-bordered">
+            {{ formSet.management_form }}
+              <thead>
+                <tr>
+                    <th></th>
+                    <th>{{ formSet.empty_form.nombre.label|safe }}</th>
+                    <th>{{ formSet.empty_form.talle.label|safe }}</th>
+                    <th>{{ formSet.empty_form.dorsal.label|safe }}</th>
+                    <th>{{ formSet.empty_form.molde.label|safe }}</th>
+                    <th>{{ formSet.empty_form.cuello_tipo.label|safe }}</th>
+                    <th>{{ formSet.empty_form.cuello_color.label|safe }}</th>
+                    <th>{{ formSet.empty_form.observacion.label|safe }}</th>
+                    <th>{{ formSet.empty_form.indumentaria.label|safe }}</th>
+                    <th>{{ formSet.empty_form.calidad.label|safe }}</th>
+                    <th>{{ formSet.empty_form.cantidad.label|safe }}</th>
+                    <th>{{ formSet.empty_form.precio_aprobado.label|safe }}</th>
+                    <th>Eliminar?</th>
+                </tr>
+              </thead>
+              <tbody id = "formset-body">
+              {% for f in formSet %}                                        
+                <tr class="formset-row">
+                    <td>{{ f.id }}</td>
+                    <td>{{ f.nombre }}</td>
+                    <td>{{ f.talle }}</td>
+                    <td>{{ f.dorsal }}</td>
+                    <td>{{ f.molde }}</td>
+                    <td>{{ f.cuello_tipo }}</td>
+                    <td>{{ f.cuello_color }}</td>
+                    <td>{{ f.observacion }}</td>
+                    <td>{{ f.indumentaria }}</td>
+                    <td>{{ f.calidad }}</td>
+                    <td>{{ f.cantidad }}</td>
+                    <td>{{ f.precio_aprobado }}</td> 
+                    <td>{{ f.DELETE }}</td>       
+                    <!-- <td><button type="button" class="remove-row">❌</button></td>     -->
+                </tr>                                
+              {% endfor %}
+              </tbody>
+            </table>  
+            <!-- Form vacío oculto -->
+            <template id="empty-form">
+                <tr class="formset-row">
+                <td>{{ formSet.empty_form.id }}</td>
+                <td>{{ formSet.empty_form.nombre }}</td>
+                <td>{{ formSet.empty_form.talle }}</td>
+                <td>{{ formSet.empty_form.dorsal }}</td>
+                <td>{{ formSet.empty_form.molde }}</td>
+                <td>{{ formSet.empty_form.cuello_tipo }}</td>
+                <td>{{ formSet.empty_form.cuello_color }}</td>
+                <td>{{ formSet.empty_form.observacion }}</td>
+                <td>{{ formSet.empty_form.indumentaria }}</td>
+                <td>{{ formSet.empty_form.calidad }}</td>
+                <td>{{ formSet.empty_form.cantidad }}</td>
+                <td>{{ formSet.empty_form.precio_aprobado }}</td>   
+                <!-- <td>{{ formSet.empty_form.DELETE }}</td>        -->
+                <td><button type="button" class="remove-row">❌</button></td>
+                </tr>
+            </template>    
+        </div>
+        <button type="button" class="btn btn-secondary" id="add-form"><ion-icon name="add-circle-outline"></ion-icon> Agregar detalle</button>
+        <button class="btn btn-success"><ion-icon name="reload-circle-outline"></ion-icon> Actualizar</button>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+  let formsetBody = document.getElementById("formset-body");
+  let addButton = document.getElementById("add-form");
+  let emptyForm = document.getElementById("empty-form").innerHTML;
+  let totalForms = document.getElementById("id_detalles-TOTAL_FORMS");
+  
+  const previewContainer = document.getElementById('preview');
+  
+  // Agregar nueva fila
+  addButton.addEventListener("click", function() {
+    let formIndex = totalForms.value;
+    //console.log(emptyForm)
+    let newRow = emptyForm.replace(/__prefix__/g, formIndex);
+    console.log(newRow)
+    formsetBody.insertAdjacentHTML("beforeend", newRow);
+    totalForms.value = parseInt(formIndex) + 1;
+  });
+
+  // Eliminar fila
+  formsetBody.addEventListener("click", function(e) {
+    if (e.target.classList.contains("remove-row")) {
+      const row = e.target.closest("tr");
+      if (row) {
+        row.remove();
+        // Actualizar el TOTAL_FORMS para reflejar el cambio
+        totalForms.value = formsetBody.querySelectorAll(".formset-row").length;
+      }
+    }
+  });
+
+  function mostrarVistaPrevia(inputId){    
+    const input = document.getElementById(inputId);
+
+    input.addEventListener('change', function () {
+      //previewContainer.innerHTML = ''; // Limpiar vista previa anterior
+      const files = input.files;
+
+      if (files.length > 0) {
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                  const img = document.getElementById(inputId+'_vp');
+                  img.src = e.target.result;   
+                  img.style.display = 'block';                
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+      }
+    });
+  }  
+
+  function actualizarPrecio(row) {
+    const indumentaria = row.querySelector('[name$="-indumentaria"]').value;
+    const calidad = row.querySelector('[name$="-calidad"]').value;
+    const precioInput = row.querySelector('[name$="-precio_aprobado"]');
+    if (indumentaria && calidad) {
+      fetch(`/obtener_precio/?indumentaria=${encodeURIComponent(indumentaria)}&calidad=${encodeURIComponent(calidad)}`)
+        .then(response => response.json())
+        .then(data => {          
+          const precioFormateado = parseFloat(data.precio).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          console.log(precioFormateado);
+          precioInput.value = data.precio;
+        });
+    }
+  }
+
+  // Para cada fila existente
+  document.querySelectorAll('.formset-row').forEach(row => {
+    const indumentariaSelect = row.querySelector('[name$="-indumentaria"]');
+    const calidadSelect = row.querySelector('[name$="-calidad"]');
+    if (indumentariaSelect && calidadSelect) {
+      indumentariaSelect.addEventListener('change', () => actualizarPrecio(row));
+      calidadSelect.addEventListener('change', () => actualizarPrecio(row));
+    }
+  });
+
+  // Para nuevas filas agregadas dinámicamente
+  document.getElementById("formset-body").addEventListener("change", function(e) {
+    if (e.target.name.endsWith('-indumentaria') || e.target.name.endsWith('-calidad')) {
+      const row = e.target.closest('.formset-row');
+      actualizarPrecio(row);
+    }
+  });
+  mostrarVistaPrevia('id_img_jugadores')
+  mostrarVistaPrevia('id_img_arquero')
+  mostrarVistaPrevia('id_img_auspicio1')
+  mostrarVistaPrevia('id_img_auspicio2')
+  mostrarVistaPrevia('id_img_auspicio3')
+  mostrarVistaPrevia('id_img_auspicio4')
+  mostrarVistaPrevia('id_img_auspicio5')
+});
+</script>
+{% endblock %}
