@@ -101,11 +101,13 @@
                         <th>Molde</th>
                         <th>T.Cuello</th>
                         <th>Color Cuello</th>
+                        <th>indumentaria</th>
                         <th>Calidad</th>
                         {% if total_montos > 0 %}  
                         <th>Cantidad</th>
                         <th>Precio Aprobado</th>
                         {% endif %}
+                        <th>Observación</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -117,11 +119,13 @@
                         <td>{{item.molde}}</td>
                         <td>{{item.cuello_tipo}}</td>
                         <td>{{item.cuello_color}}</td>
+                        <td>{{item.indumentaria}}</td>
                         <td>{{item.calidad}}</td>
                         {% if total_montos > 0 %}  
                         <th>{{item.cantidad}}</th>
                         <th>{{item.precio_aprobado|intcomma}}</th>
                         {% endif %}
+                        <th>{{item.observacion}}</th>
                     </tr>
                     {% endfor %}                    
                 </tbody>
@@ -146,7 +150,7 @@
             <div class="totales">
                 {% comment %} <p><strong>Subtotal:</strong> $2,100.00</p>
                 <p><strong>IVA (16%):</strong> $336.00</p> {% endcomment %}
-                <h3><strong>TOTAL:</strong> Gs.{{ total_montos|intcomma  }}</h3>
+                <h3><strong>TOTAL:</strong> Gs.{{ total_montos|floatformat:0|intcomma }}</h3>
             </div>
         </footer>
         {% endif %}
