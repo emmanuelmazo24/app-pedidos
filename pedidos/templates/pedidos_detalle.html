@@ -1,17 +1,23 @@
 {% extends 'base.html' %}
-
+{% load humanize %}
 {% block content %}
 <div class="container">
     <h1 class="text-center text-uppercase"><ion-icon name="brush-outline"></ion-icon>Modificar Pedidos</h1>
     <h3 class="text-center text-uppercase">Pedido Nro: {{pedido.id}}</h1>
-    {{error}}
+    <div class="alert alert-danger {% if not error %}d-none {%endif%}" role="alert">    
+      {{error}}
+    </div>
     <form action="{% url 'pedidos_detalle' pedido.id %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}    
         <div class="row g-3">
         {% for field in form %}
             <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
-            {{ field.label_tag }}
-            {{ field }}
+            <strong>{{ field.label }}</strong>
+            {% if field.label == 'Total' %}
+              {{ field|intcomma}}
+            {% else %}
+              {{ field }}
+            {% endif %}
             {% if field.errors %}
                 <div class="text-danger">{{ field.errors }}</div>
             {% endif %}

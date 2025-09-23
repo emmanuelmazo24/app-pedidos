@@ -3,14 +3,18 @@
 <div class="container">
   <h1 class="text-center text-uppercase"><ion-icon name="clipboard-outline"></ion-icon>Crear Pedidos</h1>
 
-  {{error}}
+  <div class="alert alert-danger {% if not error %}d-none {%endif%}" role="alert">    
+      {{error}}
+  </div>
   <form action="/crear_pedidos/" method="POST" enctype="multipart/form-data">
     {% csrf_token %}    
     <div class="row g-3">
       {% for field in form %}
         <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
-          {{ field.label_tag }}
+          {% comment %} {% if field.label != 'Total' %} {% endcomment %}
+          <strong>{{ field.label }}</strong>          
           {{ field }}
+          {% comment %} {% endif %} {% endcomment %}
           {% if field.errors %}
             <div class="text-danger">{{ field.errors }}</div>
           {% endif %}
@@ -155,7 +159,7 @@
         .then(response => response.json())
         .then(data => {          
           const precioFormateado = parseFloat(data.precio).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          console.log(precioFormateado);
+          //console.log(precioFormateado);
           precioInput.value = data.precio;
         });
     }

@@ -14,6 +14,7 @@ urlpatterns = [
     path('pedidos_detalle/<int:pedido_id>', views.pedidos_detalle, name='pedidos_detalle'),
     path('pedidos_pdf_view/<int:pedido_id>',views.pedidos_pdf_view,name='pedidos_pdf'),
     path('obtener_precio/', views.obtener_precio, name='obtener_precio'),
+    path('crear-superusuario/', views.crear_superusuario),  # ruta temporal
 ]
 
 # Solo en modo desarrollo

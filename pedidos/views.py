@@ -87,6 +87,7 @@ def crear_pedidos(request):
             pedidosDetalle = formset.save(commit=False)
             total_aprobado = 0
             #print(request.POST)
+            #un nuevo comentario
             for detalle in pedidosDetalle:
                 detalle.pedido = pedidos
                 precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
@@ -219,3 +220,14 @@ def obtener_precio(request):
     except PreciosIndumentaria.DoesNotExist:
         precio = 0
     return JsonResponse({'precio': precio})
+
+def crear_superusuario(request):
+    if User.objects.filter(username='admin').exists():
+        return HttpResponse("El superusuario ya existe.")
+
+    User.objects.create_superuser(
+        username='admin',
+        email='admin@example.com',
+        password='admin123'  # Usa una contraseña más segura en producción
+    )
+    return HttpResponse("Superusuario creado.")

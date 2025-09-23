@@ -144,8 +144,8 @@
         {% if total_montos > 0 %}      
         <footer>
             <div class="totales">
-                <p><strong>Subtotal:</strong> $2,100.00</p>
-                <p><strong>IVA (16%):</strong> $336.00</p>
+                {% comment %} <p><strong>Subtotal:</strong> $2,100.00</p>
+                <p><strong>IVA (16%):</strong> $336.00</p> {% endcomment %}
                 <h3><strong>TOTAL:</strong> Gs.{{ total_montos|intcomma  }}</h3>
             </div>
         </footer>
