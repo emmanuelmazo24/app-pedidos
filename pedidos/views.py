@@ -110,7 +110,16 @@ def crear_pedidos(request):
 @login_required
 def pedidos_detalle(request, pedido_id):
   if request.method == 'GET':
-    pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)   
+    profiles = Profile_user.objects.filter(user = request.user)
+    if profiles.exists():      
+        for profile_user in profiles:            
+            if profile_user.tipo_usuario == 'CLIENTE':
+                pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
+            else:
+                pedido = get_object_or_404(Pedidos,pk=pedido_id)
+    else:
+        pedido = get_object_or_404(Pedidos,pk=pedido_id)
+
     #pedidos_detalle = Pedidos_detalle.objects.filter(pedido=pedido)
     if pedido.estado == 'PENDIENTE':
         form = PedidosForm(instance=pedido)
@@ -120,7 +129,16 @@ def pedidos_detalle(request, pedido_id):
         return redirect('pedidos')
   else:
     try:
-        pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)        
+        profiles = Profile_user.objects.filter(user = request.user)
+        if profiles.exists():      
+            for profile_user in profiles:            
+                if profile_user.tipo_usuario == 'CLIENTE':
+                    pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
+                else:
+                    pedido = get_object_or_404(Pedidos,pk=pedido_id)
+        else:
+            pedido = get_object_or_404(Pedidos,pk=pedido_id)
+                
         
         if request.FILES:
             form = PedidosForm(request.POST, request.FILES, instance=pedido)
