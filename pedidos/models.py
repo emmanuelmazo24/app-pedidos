@@ -51,9 +51,6 @@ class Pedidos(models.Model):
     seña = models.FloatField(default=0)
     saldo = models.FloatField(default=0)
     fecha_entrega = models.DateField(null=True, blank=True)
-    img_prueba = models.ImageField(upload_to='imagenes_pedidos/',
-        null=True,
-        blank=True), 
     img_jugadores = models.ImageField(upload_to='imagenes_pedidos/',
         null=True,
         blank=True)
