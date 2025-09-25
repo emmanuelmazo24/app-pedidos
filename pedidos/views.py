@@ -12,6 +12,18 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 import os
 
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+
+# Configuration       
+cloudinary.config( 
+    cloud_name = "dxiu0ywy9", 
+    api_key = "964487495656617", 
+    api_secret = "GJybjlD1rZoHih4rYRip78Qhlso", # Click 'View API Keys' above to copy your API secret
+    secure=True
+)
+
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
@@ -82,10 +94,14 @@ def crear_pedidos(request):
         if form.is_valid() and formset.is_valid():
             pedidos = form.save(commit=False)
             pedidos.user = request.user
+            # upload_result = cloudinary.uploader.upload("",
+            #                                 public_id="shoes")
+            # upload_result["secure_url"]
+            # pedidos.img_prueba = upload_result["secure_url"]
             pedidos.save()
             # Guardar los detalles del pedido
             pedidosDetalle = formset.save(commit=False)
-            total_aprobado = 0
+            total_aprobado = 0            
             #print(request.POST)
             #un nuevo comentario
             for detalle in pedidosDetalle:

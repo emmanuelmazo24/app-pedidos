@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'pedidos',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -143,3 +145,33 @@ if not DEBUG:
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+#CLOUDINARY_URL=cloudinary://964487495656617:GJybjlD1rZoHih4rYRip78Qhlso@dxiu0ywy9
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dxiu0ywy9',
+    'API_KEY': '964487495656617',
+    'API_SECRET': 'tu_api_secret',
+}
+
+## Configuration       
+# cloudinary.config( 
+#     cloud_name = "dxiu0ywy9", 
+#     api_key = "964487495656617", 
+#     api_secret = "GJybjlD1rZoHih4rYRip78Qhlso", # Click 'View API Keys' above to copy your API secret
+#     secure=True
+# )
+
+# Upload an image
+# upload_result = cloudinary.uploader.upload("https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg",
+#                                            public_id="shoes")
+# print(upload_result["secure_url"])
+
+# # Optimize delivery by resizing and applying auto-format and auto-quality
+# optimize_url, _ = cloudinary_url("shoes", fetch_format="auto", quality="auto")
+# print(optimize_url)
+
+# # Transform the image: auto-crop to square aspect_ratio
+# auto_crop_url, _ = cloudinary_url("shoes", width=500, height=500, crop="auto", gravity="auto")
+# print(auto_crop_url)

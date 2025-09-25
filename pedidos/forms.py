@@ -5,13 +5,14 @@ from .models import Pedidos, Pedidos_detalle, Pedidos_imagen
 class PedidosForm(ModelForm):
     class Meta:
         model = Pedidos
-        fields = ['nombre', 'contacto', 'telefono', 'total','descripcion','img_jugadores','img_arquero','img_auspicio1','img_auspicio2','img_auspicio3','img_auspicio4','img_auspicio5']
+        fields = ['nombre', 'contacto', 'telefono', 'total','descripcion','img_prueba','img_jugadores','img_arquero','img_auspicio1','img_auspicio2','img_auspicio3','img_auspicio4','img_auspicio5']
         labels = {
         'nombre': 'Pedido',
         'contacto': 'Contacto',
         'telefono': 'Teléfono',
         'descripcion': 'Descripción',
         'total': 'Total',
+        'img_prueba':'prueba',
         'img_jugadores': 'Diseño Jugadores',
         'img_arquero': 'Diseño Arquero',
         'img_auspicio1': 'Auspiciante 1',
