@@ -17,9 +17,9 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Archivos subidos por los usuarios
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# # Archivos subidos por los usuarios
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -150,11 +150,10 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 #CLOUDINARY_URL=cloudinary://964487495656617:GJybjlD1rZoHih4rYRip78Qhlso@dxiu0ywy9
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dxiu0ywy9',
-    'API_KEY': '964487495656617',
-    'API_SECRET': 'tu_api_secret',
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
 }
-
 ## Configuration       
 # cloudinary.config( 
 #     cloud_name = "dxiu0ywy9", 

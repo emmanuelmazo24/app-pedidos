@@ -17,9 +17,9 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Archivos subidos por los usuarios
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# # Archivos subidos por los usuarios
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'pedidos',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -143,3 +145,32 @@ if not DEBUG:
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+#CLOUDINARY_URL=cloudinary://964487495656617:GJybjlD1rZoHih4rYRip78Qhlso@dxiu0ywy9
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
+}
+## Configuration       
+# cloudinary.config( 
+#     cloud_name = "dxiu0ywy9", 
+#     api_key = "964487495656617", 
+#     api_secret = "GJybjlD1rZoHih4rYRip78Qhlso", # Click 'View API Keys' above to copy your API secret
+#     secure=True
+# )
+
+# Upload an image
+# upload_result = cloudinary.uploader.upload("https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg",
+#                                            public_id="shoes")
+# print(upload_result["secure_url"])
+
+# # Optimize delivery by resizing and applying auto-format and auto-quality
+# optimize_url, _ = cloudinary_url("shoes", fetch_format="auto", quality="auto")
+# print(optimize_url)
+
+# # Transform the image: auto-crop to square aspect_ratio
+# auto_crop_url, _ = cloudinary_url("shoes", width=500, height=500, crop="auto", gravity="auto")
+# print(auto_crop_url)
