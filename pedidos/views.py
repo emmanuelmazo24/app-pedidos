@@ -10,6 +10,7 @@ from xhtml2pdf import pisa
 from django.template.loader import get_template
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
+from .utils import obtener_tipo_usuario
 import os
 
 import cloudinary
@@ -58,6 +59,9 @@ def signin(request):
         if user is None:
             return render(request, 'signin.html', {"form": AuthenticationForm, "error": "Usuario o Password incorrecto."})
 
+        #user.tipo_usuario = Profile_user.objects.get(user=user).tipo_usuario if Profile_user.objects.filter(user=user).exists() else 'ADMIN'
+        #print(Profile_user.objects.get(user=user).tipo_usuario if Profile_user.objects.filter(user=user).exists() else 'ADMIN')
+        #print(user.tipo_usuario)
         login(request, user)
         return redirect('pedidos')
 
@@ -68,17 +72,24 @@ def signout(request):
 
 @login_required
 def pedidos(request):
-    profiles = Profile_user.objects.filter(user = request.user)
-
-    if profiles.exists():        
-        for profile in profiles:
-            
-            if profile.tipo_usuario == 'CLIENTE':
-                pedidos = Pedidos.objects.filter(user=request.user)
-            else:
-                pedidos = Pedidos.objects.all()
+    #profiles = Profile_user.objects.filter(user = request.user)
+    tipo_usuario = obtener_tipo_usuario(request.user)
+    # if profiles.exists():        
+    #     for profile in profiles:
+    #         tipo_usuario = profile.tipo_usuario
+    #         if profile.tipo_usuario == 'CLIENTE':
+    #             pedidos = Pedidos.objects.filter(user=request.user)
+    #         else:
+    #             pedidos = Pedidos.objects.all()
+    # else:
+    #     tipo_usuario = 'ADMIN'
+    #     pedidos = Pedidos.objects.all()
+    if tipo_usuario == 'CLIENTE':
+        pedidos = Pedidos.objects.filter(user=request.user)
     else:
         pedidos = Pedidos.objects.all()
+
+    #print(tipo_usuario)
     # if profile.tipo_usuario == 'CLIENTE':
     #     pedidos = Pedidos.objects.filter(user=request.user)
     # else:
@@ -208,40 +219,37 @@ def render_to_pdf(template_src, context_dict={}):
 
 @login_required
 def pedidos_pdf_view(request, pedido_id):
-    profiles = Profile_user.objects.filter(user = request.user)
-    if profiles.exists():      
-        for profile_user in profiles:            
-            if profile_user.tipo_usuario == 'CLIENTE':
-                pedidos = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
-            else:
-                pedidos = get_object_or_404(Pedidos,pk=pedido_id)
-
-        pedidos_detalle = Pedidos_detalle.objects.filter(pedido=pedidos)
-        #pedidos_imagen = Pedidos_imagen.objects.filter(pedido=pedidos)  
-
-        # for img in pedidos_imagen:
-        #     img.imagen_path = os.path.join(settings.MEDIA_ROOT, os.path.basename(img.imagen.name))
-        pedidos.img_jugadores_url = request.build_absolute_uri(pedidos.img_jugadores.url) if pedidos.img_jugadores else ''
-        pedidos.img_arquero_url = request.build_absolute_uri(pedidos.img_arquero.url) if pedidos.img_arquero else ''
-        pedidos.img_auspicio1_url = request.build_absolute_uri(pedidos.img_auspicio1.url) if pedidos.img_auspicio1 else ''
-        pedidos.img_auspicio2_url = request.build_absolute_uri(pedidos.img_auspicio2.url) if pedidos.img_auspicio2 else ''
-        pedidos.img_auspicio3_url = request.build_absolute_uri(pedidos.img_auspicio3.url) if pedidos.img_auspicio3 else ''
-        pedidos.img_auspicio4_url = request.build_absolute_uri(pedidos.img_auspicio4.url) if pedidos.img_auspicio4 else ''
-        pedidos.img_auspicio5_url = request.build_absolute_uri(pedidos.img_auspicio5.url) if pedidos.img_auspicio5 else ''
-
-        # for img in pedidos_imagen:
-        #     img.imagen_url = request.build_absolute_uri(img.imagen.url)  
-
-        total_montos = sum([d.precio_aprobado * d.cantidad for d in pedidos_detalle])
-        
-        context = {
-            "pedidos": pedidos,
-            "pedidos_detalle": pedidos_detalle,        
-            "total_montos": total_montos,
-        }
+    #profiles = Profile_user.objects.filter(user = request.user)
+    tipo_usuario = obtener_tipo_usuario(request.user)
+           
+    if tipo_usuario == 'CLIENTE':
+        pedidos = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
     else:
-        return redirect('pedidos')
-        return HttpResponse('No tiene permisos para ver este pedido.')
+        pedidos = get_object_or_404(Pedidos,pk=pedido_id)
+
+    pedidos_detalle = Pedidos_detalle.objects.filter(pedido=pedidos)
+    #pedidos_imagen = Pedidos_imagen.objects.filter(pedido=pedidos)  
+
+    # for img in pedidos_imagen:
+    #     img.imagen_path = os.path.join(settings.MEDIA_ROOT, os.path.basename(img.imagen.name))
+    pedidos.img_jugadores_url = request.build_absolute_uri(pedidos.img_jugadores.url) if pedidos.img_jugadores else ''
+    pedidos.img_arquero_url = request.build_absolute_uri(pedidos.img_arquero.url) if pedidos.img_arquero else ''
+    pedidos.img_auspicio1_url = request.build_absolute_uri(pedidos.img_auspicio1.url) if pedidos.img_auspicio1 else ''
+    pedidos.img_auspicio2_url = request.build_absolute_uri(pedidos.img_auspicio2.url) if pedidos.img_auspicio2 else ''
+    pedidos.img_auspicio3_url = request.build_absolute_uri(pedidos.img_auspicio3.url) if pedidos.img_auspicio3 else ''
+    pedidos.img_auspicio4_url = request.build_absolute_uri(pedidos.img_auspicio4.url) if pedidos.img_auspicio4 else ''
+    pedidos.img_auspicio5_url = request.build_absolute_uri(pedidos.img_auspicio5.url) if pedidos.img_auspicio5 else ''
+
+    # for img in pedidos_imagen:
+    #     img.imagen_url = request.build_absolute_uri(img.imagen.url)  
+
+    total_montos = sum([d.precio_aprobado * d.cantidad for d in pedidos_detalle])
+    
+    context = {
+        "pedidos": pedidos,
+        "pedidos_detalle": pedidos_detalle,        
+        "total_montos": total_montos,
+    }
     #return render_to_pdf('pedido_pdf_template.html', context)
     return render(request, 'pedido_pdf_template.html', context)
 
@@ -254,6 +262,14 @@ def obtener_precio(request):
     except PreciosIndumentaria.DoesNotExist:
         precio = 0
     return JsonResponse({'precio': precio})
+
+@login_required
+def pedidos_aprobar(request, pedido_id):
+    pedido = get_object_or_404(Pedidos, pk=pedido_id)
+    if request.method == 'POST':
+        pedido.estado = 'APROBADO' if pedido.estado == 'PENDIENTE' else 'PENDIENTE'
+        pedido.save()
+        return redirect('pedidos')
 
 def crear_superusuario(request):
     if User.objects.filter(username='admin').exists():

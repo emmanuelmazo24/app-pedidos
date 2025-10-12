@@ -15,9 +15,26 @@
             <a href="{% url 'pedidos_detalle' pedido.id %}"><ion-icon name="eye-outline" ></ion-icon></a>            -->
             <strong> Estado: {{ pedido.estado }}</strong>
             {% if pedido.estado == 'PENDIENTE' %}
-                <strong> Modificar</strong>
-                <a href="{% url 'pedidos_detalle' pedido.id %}"><ion-icon name="create-outline" ></ion-icon></a>           
+            <a href="{% url 'pedidos_detalle' pedido.id %}">
+                <button>
+                    <strong> Modificar</strong>
+                    <ion-icon name="create-outline" ></ion-icon>
+                </button> 
+            </a>           
             {% endif %}	
+            {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
+                <form action="{% url 'pedidos_aprobar' pedido.id %}" method="POST">
+                {% csrf_token %}
+                <button>
+                    {% if pedido.estado == 'PENDIENTE' %}
+                    <strong> Aprobar Pedido?</strong>
+                    {% else %}
+                    <strong> Desaprobar Pedido?</strong>
+                    {% endif %}
+                    <ion-icon name="chevron-down-circle-outline"></ion-icon>
+                </button>
+                </form>    
+            {% endif %}
         </li>
     {% empty %}
         <li>No hay pedidos disponibles.</li>
