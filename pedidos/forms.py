@@ -1,7 +1,6 @@
 from django import forms
 from django.forms import ModelForm,inlineformset_factory
-from .models import Pedidos, Pedidos_detalle, Pedidos_imagen
-
+from .models import Pedidos, Pedidos_detalle, Pedidos_imagen, PreciosIndumentaria
 class PedidosForm(ModelForm):
     class Meta:
         model = Pedidos
@@ -114,6 +113,16 @@ class PedidosDetalleForm(ModelForm):
                  'precio_aprobado': forms.NumberInput(attrs={'readonly': 'readonly'}),
                  'id': forms.HiddenInput()}
         
+class PreciosIndumentariaForm(ModelForm):
+    class Meta:
+        model = PreciosIndumentaria
+        fields = ['calidad','indumentaria','precio_unitario']
+        Labels = {'calidad': 'Calidad',
+                  'indumentaria': 'Indumentaria',
+                  'precio_unitario': 'Precio Unitario'}
+        widgers = {'calidad': forms.Select(),
+                    'indumentaria': forms.Select(),
+                    'precio_unitario': forms.NumberInput()}
 
 # Inline Formset: permite manejar cabecera + detalle
 DetallePedidosFormSet = inlineformset_factory(

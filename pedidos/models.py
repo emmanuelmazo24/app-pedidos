@@ -105,5 +105,6 @@ class PreciosIndumentaria(models.Model):
     calidad = models.CharField(max_length=20,choices=CALIDAD_CHOICES)
     indumentaria = models.CharField(max_length=20,choices=INDUMENTARIA_CHOICES)
     precio_unitario = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

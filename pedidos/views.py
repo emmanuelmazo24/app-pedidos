@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PedidosForm, PedidosDetalleForm, DetallePedidosFormSet, DetallePedidosEdFormSet
+from .forms import PedidosForm, PedidosDetalleForm, DetallePedidosFormSet, DetallePedidosEdFormSet,PreciosIndumentariaForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
@@ -132,18 +132,14 @@ def crear_pedidos(request):
       form = PedidosForm()
       pedido = Pedidos()
       formset = DetallePedidosFormSet(instance=pedido)      
-    return render(request, 'create_pedido.html', {'form': form, 'formset': formset})
+      return render(request, 'create_pedido.html', {'form': form, 'formset': formset})
 
 @login_required
 def pedidos_detalle(request, pedido_id):
-  if request.method == 'GET':
-    profiles = Profile_user.objects.filter(user = request.user)
-    if profiles.exists():      
-        for profile_user in profiles:            
-            if profile_user.tipo_usuario == 'CLIENTE':
-                pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
-            else:
-                pedido = get_object_or_404(Pedidos,pk=pedido_id)
+  tipo_usuario = obtener_tipo_usuario(request.user)
+  if request.method == 'GET':          
+    if tipo_usuario == 'CLIENTE':
+        pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
     else:
         pedido = get_object_or_404(Pedidos,pk=pedido_id)
 
@@ -155,55 +151,50 @@ def pedidos_detalle(request, pedido_id):
     else:
         return redirect('pedidos')
   else:
-    try:
-        profiles = Profile_user.objects.filter(user = request.user)
-        if profiles.exists():      
-            for profile_user in profiles:            
-                if profile_user.tipo_usuario == 'CLIENTE':
-                    pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
-                else:
-                    pedido = get_object_or_404(Pedidos,pk=pedido_id)
-        else:
-            pedido = get_object_or_404(Pedidos,pk=pedido_id)
-                
-        
-        if request.FILES:
-            form = PedidosForm(request.POST, request.FILES, instance=pedido)
-        else:
-            form = PedidosForm(request.POST, instance=pedido)
-        total_aprobado = 0
-        formset = DetallePedidosEdFormSet(request.POST, instance=pedido)
-        
-        # print(form.is_valid())
-        # print(formset.is_valid())
-        # print(formset.errors)  # Muestra los errores de cada formulario en el formset
-        #print(formset.non_form_errors())  # Muestra errores generales del formset
-        if form.is_valid() and formset.is_valid():            
-            #print('valido')
-            form.save()
-            # Guardar los detalles del pedido
-            pedidosDetalle = formset.save(commit=False)
-            #print(pedidosDetalle)
-            for detalle in pedidosDetalle:  
-                #print('actualiza detalle')              
-                detalle.pedido = pedido
-                precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
-                detalle.precio_aprobado = precio
-                detalle.save()                
+    try:         
+      if tipo_usuario == 'CLIENTE':
+          pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
+      else:
+          pedido = get_object_or_404(Pedidos,pk=pedido_id)
+              
+      
+      if request.FILES:
+          form = PedidosForm(request.POST, request.FILES, instance=pedido)
+      else:
+          form = PedidosForm(request.POST, instance=pedido)
+      total_aprobado = 0
+      formset = DetallePedidosEdFormSet(request.POST, instance=pedido)
+      
+      # print(form.is_valid())
+      # print(formset.is_valid())
+      # print(formset.errors)  # Muestra los errores de cada formulario en el formset
+      #print(formset.non_form_errors())  # Muestra errores generales del formset
+      if form.is_valid() and formset.is_valid():            
+          #print('valido')
+          form.save()
+          # Guardar los detalles del pedido
+          pedidosDetalle = formset.save(commit=False)
+          #print(pedidosDetalle)
+          for detalle in pedidosDetalle:  
+              #print('actualiza detalle')              
+              detalle.pedido = pedido
+              precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
+              detalle.precio_aprobado = precio
+              detalle.save()                
 
-            pedidosDetalle = Pedidos_detalle.objects.filter(pedido=pedido)
-            for detalle in pedidosDetalle:
-                total_aprobado += detalle.precio_aprobado
-            # Eliminar los detalles marcados para eliminación         
-            for detalle in formset.deleted_objects:
-                #print(detalle)
-                precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
-                detalle.delete()
-                total_aprobado -= precio
-            # Guardar la suma en la cabecera del pedido
-            pedido.total = total_aprobado
-            pedido.save()
-        return redirect('pedidos')
+          pedidosDetalle = Pedidos_detalle.objects.filter(pedido=pedido)
+          for detalle in pedidosDetalle:
+              total_aprobado += detalle.precio_aprobado
+          # Eliminar los detalles marcados para eliminación         
+          for detalle in formset.deleted_objects:
+              #print(detalle)
+              precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
+              detalle.delete()
+              total_aprobado -= precio
+          # Guardar la suma en la cabecera del pedido
+          pedido.total = total_aprobado
+          pedido.save()
+      return redirect('pedidos')
     except ValueError:
         return render(request, 'pedidos_detalle.html', {'form': form, 'formSet': formset, 'error': 'Ocurrió un error al actualizar el pedido. Por favor, intente de nuevo.'})
 
@@ -270,6 +261,43 @@ def pedidos_aprobar(request, pedido_id):
         pedido.estado = 'APROBADO' if pedido.estado == 'PENDIENTE' else 'PENDIENTE'
         pedido.save()
         return redirect('pedidos')
+
+@login_required
+def precio_indumentaria(request,precio_id=None):
+  error = None
+  if precio_id:
+    precio = get_object_or_404(PreciosIndumentaria,pk=precio_id)
+  else:
+    precio = None
+
+  if request.method == 'POST':    
+    form = PreciosIndumentariaForm(request.POST, instance=precio)
+    if form.is_valid():
+        precio_form = form.save(commit=False)
+        precio_form.user = request.user
+        precio_form.save()
+        return redirect('precio_indumentaria') # Redirige al listado
+    else:
+        error = "Ocurrió un error al procesar el formulario."
+  else:
+    form = PreciosIndumentariaForm(instance=precio) 
+
+  precios = PreciosIndumentaria.objects.all() 
+  context = {
+      'form': form,
+      'precios': precios,
+      'error': error,
+    }
+  return render(request, 'precios_indumentaria.html', context)
+
+@login_required
+def del_precio(request, precio_id):
+  tipo_usuario = obtener_tipo_usuario(request.user)
+  if tipo_usuario != 'CLIENTE':
+    precios = get_object_or_404(PreciosIndumentaria, pk=precio_id)
+    if request.method == 'POST':
+        precios.delete()
+        return redirect('precio_indumentaria')
 
 def crear_superusuario(request):
     if User.objects.filter(username='admin').exists():

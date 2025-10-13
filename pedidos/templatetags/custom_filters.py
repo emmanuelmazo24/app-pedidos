@@ -10,3 +10,7 @@ def miles_decimal(value, decimales=2):
         return f"{value:,.{decimales}f}".replace(",", "X").replace(".", ",").replace("X", ".")
     except (ValueError, TypeError):
         return value
+
+@register.filter
+def get_field_value(obj, field_name):
+    return getattr(obj, field_name)
