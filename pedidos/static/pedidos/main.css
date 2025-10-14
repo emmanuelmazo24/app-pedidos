@@ -1,0 +1,39 @@
+body {
+    /*
+      La ruta es relativa al archivo CSS.
+      ../images/ indica que debe subir un nivel para buscar la carpeta 'images'.
+    */
+    /* Define la posición relativa para que el pseudo-elemento se posicione correctamente */
+    position: relative; 
+    /* Establece un z-index para garantizar que el contenido esté encima */
+    z-index: 1; 
+    /* Asegura que el body ocupe al menos el alto de la ventana */
+    min-height: 100vh;
+    /*background-image: url('../pedidos/images/logo_vepa.jpeg');*/
+    /*background-repeat:repeat;*/
+    /*background-size:150px 150px;*/ /* Ajusta la imagen para cubrir todo el fondo */
+    /*background-attachment: fixed;*/ /* Mantiene la imagen en su lugar al hacer scroll */
+}
+
+/* Pseudo-elemento para la imagen de fondo */
+body::before {
+    /* Es necesario para que el pseudo-elemento sea visible */
+    content: ""; 
+    /* Se posiciona de forma absoluta dentro del body */
+    position: absolute; 
+    /* Cubre toda la superficie del body */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* Propiedades de la imagen de fondo */
+    background-image: url('../pedidos/images/logo_vepa.jpeg');
+    background-repeat: repeat; /* Para un mosaico */
+    
+    /* Ajusta este valor para la transparencia */
+    opacity: 0.3; 
+    
+    /* Asegura que la imagen esté detrás del contenido */
+    z-index: -1; 
+}
