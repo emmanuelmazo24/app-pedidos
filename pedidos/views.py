@@ -66,6 +66,29 @@ def signin(request):
         return redirect('pedidos')
 
 @login_required
+def update_pass(request):
+    if request.method == 'POST':
+        usuario = request.user
+        if not usuario.check_password(request.POST["user_pass"]):
+            return render(request, 'perfil.html', {"error": "La contraseña actual es incorrecta."})
+        
+        if request.POST["user_pass_nv"] == request.POST["user_pass_nvr"]:
+            try:
+                user = User.objects.create_user(
+                    request.POST["username"], password=request.POST["password1"])
+                user.save()
+                Profile_user.objects.create(
+                    user=user,
+                    tipo_usuario = 'CLIENTE'
+                )
+                login(request, user)
+                return redirect('pedidos')
+            except IntegrityError:
+                return render(request, 'signup.html', {"form": UserCreationForm, "error": "Usuario ya existe."})
+
+            return render(request, 'signup.html', {"form": UserCreationForm, "error": "Verifique password."})  
+
+@login_required
 def signout(request):
     logout(request)
     return redirect('index')
@@ -298,6 +321,9 @@ def del_precio(request, precio_id):
     if request.method == 'POST':
         precios.delete()
         return redirect('precio_indumentaria')
+@login_required
+def pefil_user(request):
+    return render(request, 'perfil.html')
 
 def crear_superusuario(request):
     if User.objects.filter(username='admin').exists():

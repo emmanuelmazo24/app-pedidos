@@ -7,87 +7,91 @@
     <div class="alert alert-danger {% if not error %}d-none {%endif%}" role="alert">    
       {{error}}
     </div>
-    <form action="{% url 'pedidos_detalle' pedido.id %}" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}    
-        <div class="row g-3">
-        {% for field in form %}
-            <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
-            <strong>{{ field.label }}</strong>
-            {% if field.label == 'Total' %}
-              {{ field|intcomma}}
-            {% else %}
-              {{ field }}
-            {% endif %}
-            {% if field.errors %}
-                <div class="text-danger">{{ field.errors }}</div>
-            {% endif %}
-            </div>             
-        {% endfor %}
-        </div>         
-        <div class="table-responsive p-2">
-            <table id ="detalle-table" class="table-primary table-bordered">
-            {{ formSet.management_form }}
-              <thead>
-                <tr class="bg-success">
-                    <th></th>
-                    <th>{{ formSet.empty_form.nombre.label|safe }}</th>
-                    <th>{{ formSet.empty_form.talle.label|safe }}</th>
-                    <th>{{ formSet.empty_form.dorsal.label|safe }}</th>
-                    <th>{{ formSet.empty_form.molde.label|safe }}</th>
-                    <th>{{ formSet.empty_form.cuello_tipo.label|safe }}</th>
-                    <th>{{ formSet.empty_form.cuello_color.label|safe }}</th>
-                    <th>{{ formSet.empty_form.observacion.label|safe }}</th>
-                    <th>{{ formSet.empty_form.indumentaria.label|safe }}</th>
-                    <th>{{ formSet.empty_form.calidad.label|safe }}</th>
-                    <th>{{ formSet.empty_form.cantidad.label|safe }}</th>
-                    <th>{{ formSet.empty_form.precio_aprobado.label|safe }}</th>
-                    <th>Eliminar?</th>
-                </tr>
-              </thead>
-              <tbody id = "formset-body">
-              {% for f in formSet %}                                        
-                <tr class="formset-row">
-                    <td>{{ f.id }}</td>
-                    <td>{{ f.nombre }}</td>
-                    <td>{{ f.talle }}</td>
-                    <td>{{ f.dorsal }}</td>
-                    <td>{{ f.molde }}</td>
-                    <td>{{ f.cuello_tipo }}</td>
-                    <td>{{ f.cuello_color }}</td>
-                    <td>{{ f.observacion }}</td>
-                    <td>{{ f.indumentaria }}</td>
-                    <td>{{ f.calidad }}</td>
-                    <td>{{ f.cantidad }}</td>
-                    <td>{{ f.precio_aprobado }}</td> 
-                    <td>{{ f.DELETE }}</td>       
-                    <!-- <td><button type="button" class="remove-row">❌</button></td>     -->
-                </tr>                                
-              {% endfor %}
-              </tbody>
-            </table>  
-            <!-- Form vacío oculto -->
-            <template id="empty-form">
-                <tr class="formset-row">
-                <td>{{ formSet.empty_form.id }}</td>
-                <td>{{ formSet.empty_form.nombre }}</td>
-                <td>{{ formSet.empty_form.talle }}</td>
-                <td>{{ formSet.empty_form.dorsal }}</td>
-                <td>{{ formSet.empty_form.molde }}</td>
-                <td>{{ formSet.empty_form.cuello_tipo }}</td>
-                <td>{{ formSet.empty_form.cuello_color }}</td>
-                <td>{{ formSet.empty_form.observacion }}</td>
-                <td>{{ formSet.empty_form.indumentaria }}</td>
-                <td>{{ formSet.empty_form.calidad }}</td>
-                <td>{{ formSet.empty_form.cantidad }}</td>
-                <td>{{ formSet.empty_form.precio_aprobado }}</td>   
-                <!-- <td>{{ formSet.empty_form.DELETE }}</td>        -->
-                <td><button type="button" class="remove-row">❌</button></td>
-                </tr>
-            </template>    
-        </div>
-        <button type="button" class="btn btn-secondary" id="add-form"><ion-icon name="add-circle-outline"></ion-icon> Agregar detalle</button>
-        <button class="btn btn-success"><ion-icon name="reload-circle-outline"></ion-icon> Actualizar</button>
-    </form>
+    <div class="card">
+      <div class="card-body">
+        <form action="{% url 'pedidos_detalle' pedido.id %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}    
+          <div class="row g-3">
+          {% for field in form %}
+              <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
+              <strong>{{ field.label }}</strong>
+              {% if field.label == 'Total' %}
+                {{ field|intcomma}}
+              {% else %}
+                {{ field }}
+              {% endif %}
+              {% if field.errors %}
+                  <div class="text-danger">{{ field.errors }}</div>
+              {% endif %}
+              </div>             
+          {% endfor %}
+          </div>         
+          <div class="table-responsive p-2">
+              <table id ="detalle-table" class="table-primary table-bordered">
+              {{ formSet.management_form }}
+                <thead>
+                  <tr class="bg-success">
+                      <th></th>
+                      <th>{{ formSet.empty_form.nombre.label|safe }}</th>
+                      <th>{{ formSet.empty_form.talle.label|safe }}</th>
+                      <th>{{ formSet.empty_form.dorsal.label|safe }}</th>
+                      <th>{{ formSet.empty_form.molde.label|safe }}</th>
+                      <th>{{ formSet.empty_form.cuello_tipo.label|safe }}</th>
+                      <th>{{ formSet.empty_form.cuello_color.label|safe }}</th>
+                      <th>{{ formSet.empty_form.observacion.label|safe }}</th>
+                      <th>{{ formSet.empty_form.indumentaria.label|safe }}</th>
+                      <th>{{ formSet.empty_form.calidad.label|safe }}</th>
+                      <th>{{ formSet.empty_form.cantidad.label|safe }}</th>
+                      <th>{{ formSet.empty_form.precio_aprobado.label|safe }}</th>
+                      <th>Eliminar?</th>
+                  </tr>
+                </thead>
+                <tbody id = "formset-body">
+                {% for f in formSet %}                                        
+                  <tr class="formset-row">
+                      <td>{{ f.id }}</td>
+                      <td>{{ f.nombre }}</td>
+                      <td>{{ f.talle }}</td>
+                      <td>{{ f.dorsal }}</td>
+                      <td>{{ f.molde }}</td>
+                      <td>{{ f.cuello_tipo }}</td>
+                      <td>{{ f.cuello_color }}</td>
+                      <td>{{ f.observacion }}</td>
+                      <td>{{ f.indumentaria }}</td>
+                      <td>{{ f.calidad }}</td>
+                      <td>{{ f.cantidad }}</td>
+                      <td>{{ f.precio_aprobado }}</td> 
+                      <td>{{ f.DELETE }}</td>       
+                      <!-- <td><button type="button" class="remove-row">❌</button></td>     -->
+                  </tr>                                
+                {% endfor %}
+                </tbody>
+              </table>  
+              <!-- Form vacío oculto -->
+              <template id="empty-form">
+                  <tr class="formset-row">
+                  <td>{{ formSet.empty_form.id }}</td>
+                  <td>{{ formSet.empty_form.nombre }}</td>
+                  <td>{{ formSet.empty_form.talle }}</td>
+                  <td>{{ formSet.empty_form.dorsal }}</td>
+                  <td>{{ formSet.empty_form.molde }}</td>
+                  <td>{{ formSet.empty_form.cuello_tipo }}</td>
+                  <td>{{ formSet.empty_form.cuello_color }}</td>
+                  <td>{{ formSet.empty_form.observacion }}</td>
+                  <td>{{ formSet.empty_form.indumentaria }}</td>
+                  <td>{{ formSet.empty_form.calidad }}</td>
+                  <td>{{ formSet.empty_form.cantidad }}</td>
+                  <td>{{ formSet.empty_form.precio_aprobado }}</td>   
+                  <!-- <td>{{ formSet.empty_form.DELETE }}</td>        -->
+                  <td><button type="button" class="remove-row">❌</button></td>
+                  </tr>
+              </template>    
+          </div>
+          <button type="button" class="btn btn-secondary" id="add-form"><ion-icon name="add-circle-outline"></ion-icon> Agregar detalle</button>
+          <button class="btn btn-success"><ion-icon name="reload-circle-outline"></ion-icon> Actualizar</button>
+        </form>
+      </div>
+    </div>    
 </div>
 {% endblock %}
 {% block scripts %}
