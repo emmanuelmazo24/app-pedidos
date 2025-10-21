@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PedidosForm, PedidosDetalleForm, DetallePedidosFormSet, DetallePedidosEdFormSet,PreciosIndumentariaForm,MiCambioPasswordForm
+from .forms import PedidosForm, DetallePedidosFormSet, DetallePedidosEdFormSet,PreciosIndumentariaForm,MiCambioPasswordForm, EditarPerfilForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from django.contrib.auth import login, logout, authenticate,update_session_auth_hash
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
 from .models import Pedidos, Profile_user,Pedidos_detalle, Pedidos_imagen,PreciosIndumentaria
@@ -13,18 +13,6 @@ from django.conf import settings
 from .utils import obtener_tipo_usuario
 from django.contrib import messages
 import os
-
-import cloudinary
-import cloudinary.uploader
-from cloudinary.utils import cloudinary_url
-
-# Configuration       
-cloudinary.config( 
-    cloud_name = "dxiu0ywy9", 
-    api_key = "964487495656617", 
-    api_secret = "GJybjlD1rZoHih4rYRip78Qhlso", # Click 'View API Keys' above to copy your API secret
-    secure=True
-)
 
 # Create your views here.
 def index(request):
@@ -67,6 +55,48 @@ def signin(request):
         return redirect('pedidos')
 
 @login_required
+def perfil(request):
+   return render(request, 'perfil.html')
+
+@login_required
+def update_password(request):
+    error = None
+    if request.method == 'POST':
+        form = MiCambioPasswordForm(request.POST)
+        if form.is_valid():
+            contrasenha_actual = form.cleaned_data['contrasenha_actual']
+            nueva_contrasenha = form.cleaned_data['nueva_contrasenha']            
+            usuario = request.user
+
+            if not usuario.check_password(contrasenha_actual):
+                #error = "La contraseña actual es incorrecta."
+                form.add_error('contrasenha_actual', 'La contraseña actual es incorrecta.')
+            else:
+                usuario.set_password(nueva_contrasenha)
+                usuario.save()
+                update_session_auth_hash(request, usuario)  # Evita que se cierre la sesión
+                messages.success(request, 'Contraseña actualizada con éxito.')
+                return redirect('perfil')
+        else:
+           error = form.non_field_errors()
+    else:
+        form = MiCambioPasswordForm()
+    return render(request, 'cambiar_password.html', {'form': form, 'error' : error})
+
+@login_required
+def editar_perfil(request):
+    if request.method == 'POST':
+        form = EditarPerfilForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil actualizado con éxito.')
+            return redirect('perfil')
+    else:
+        form = EditarPerfilForm(instance=request.user)
+
+    return render(request, 'editar_perfil.html', {'form': form})
+
+@login_required
 def update_pass(request):
   if request.method == 'POST':
     user = request.user
@@ -89,29 +119,6 @@ def update_pass(request):
       messages.error(request, 'Contraseña No son iguales.')
       #login(request, user)
       return render(request, 'perfil.html')
-
-@login_required
-def cambiar_contraseha(request):
-    if request.method == 'POST':
-        form = MiCambioPasswordForm(request.POST)
-        if form.is_valid():
-            contraseña_actual = form.cleaned_data['contraseña_actual']
-            nueva_contraseña = form.cleaned_data['nueva_contraseña']
-            usuario = request.user
-
-            if not usuario.check_password(contraseña_actual):
-                form.add_error('contraseña_actual', 'La contraseña actual es incorrecta.')
-            else:
-                usuario.set_password(nueva_contraseña)
-                usuario.save()
-                update_session_auth_hash(request, usuario)  # Evita que se cierre la sesión
-                messages.success(request, 'Contraseña actualizada con éxito.')
-                return redirect('perfil_user')
-    else:
-        form = MiCambioPasswordForm()
-
-    return render(request, 'perfil.html', {'form': form})
-
 
 @login_required
 def signout(request):
@@ -174,7 +181,7 @@ def crear_pedidos(request):
             pedidos.save()
             return redirect('index')  # Redirect to a success page or another view
       except ValueError as e:
-        print(f"Error al guardar el pedido: {e}")
+        #print(f"Error al guardar el pedido: {e}")
         return render(request, 'create_pedido.html', {'form': form, 'formset': formset, 'error': 'Ocurrió un error al guardar el pedido. Por favor, intente de nuevo.'})
     else:
       form = PedidosForm()
@@ -212,7 +219,7 @@ def pedidos_detalle(request, pedido_id):
           form = PedidosForm(request.POST, instance=pedido)
       total_aprobado = 0
       formset = DetallePedidosEdFormSet(request.POST, instance=pedido)
-      
+ 
       # print(form.is_valid())
       # print(formset.is_valid())
       # print(formset.errors)  # Muestra los errores de cada formulario en el formset
@@ -346,9 +353,6 @@ def del_precio(request, precio_id):
     if request.method == 'POST':
         precios.delete()
         return redirect('precio_indumentaria')
-@login_required
-def pefil_user(request):
-    return render(request, 'perfil.html')
 
 def crear_superusuario(request):
     if User.objects.filter(username='admin').exists():

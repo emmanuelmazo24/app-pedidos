@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm,inlineformset_factory
 from .models import Pedidos, Pedidos_detalle, Pedidos_imagen, PreciosIndumentaria
+from django.contrib.auth.models import User
 class PedidosForm(ModelForm):
     class Meta:
         model = Pedidos
@@ -125,28 +126,49 @@ class PreciosIndumentariaForm(ModelForm):
                     'precio_unitario': forms.NumberInput()}
 
 class MiCambioPasswordForm(forms.Form):
-    contraseña_actual = forms.CharField(
+    contrasenha_actual = forms.CharField(
         label="Contraseña actual",
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
-    nueva_contraseña = forms.CharField(
+    nueva_contrasenha = forms.CharField(
         label="Nueva contraseña",
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
-    confirmar_contraseña = forms.CharField(
+    confirmar_contrasenha = forms.CharField(
         label="Confirmar nueva contraseña",
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
 
     def clean(self):
         cleaned_data = super().clean()
-        nueva = cleaned_data.get("nueva_contraseña")
-        confirmar = cleaned_data.get("confirmar_contraseña")
+        nueva = cleaned_data.get("nueva_contrasenha")
+        confirmar = cleaned_data.get("confirmar_contrasenha")
 
         if nueva and confirmar and nueva != confirmar:
             raise forms.ValidationError("Las contraseñas nuevas no coinciden.")
         return cleaned_data
-    
+
+class EditarPerfilForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
+        }
+        labels = {
+            'first_name': 'Nombre',
+            'last_name': 'Apellido',
+            'email': 'Correo electrónico',
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        user_qs = User.objects.filter(email=email).exclude(pk=self.instance.pk)
+        if user_qs.exists():
+            raise forms.ValidationError("Este correo ya está en uso por otro usuario.")
+        return email   
 # Inline Formset: permite manejar cabecera + detalle
 DetallePedidosFormSet = inlineformset_factory(
     Pedidos,

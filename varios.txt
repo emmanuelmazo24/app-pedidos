@@ -487,3 +487,68 @@ Estudiemos
 Voz
 No se eligió ningún archivoNo se eligió ningún archivo
 ChatGPT puede cometer errores. Comprueba la información importante.
+✅ Opción 1: Mostrar errores automáticamente (forma rápida)
+
+Si en tu plantilla estás usando:
+
+{{ form.as_p }}
+
+
+Django se encarga de mostrar los errores automáticamente debajo del campo:
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Enviar</button>
+</form>
+
+✅ Opción 2: Mostrar los campos manualmente y sus errores
+
+Si necesitas más control sobre el diseño (por ejemplo, con Bootstrap), puedes renderizar los campos individualmente y mostrar los errores así:
+
+<form method="post">
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <label for="id_contrasenha_actual" class="form-label">Contraseña actual</label>
+    {{ form.contrasenha_actual }}
+    {% if form.contrasenha_actual.errors %}
+      <div class="text-danger">
+        {% for error in form.contrasenha_actual.errors %}
+          <small>{{ error }}</small>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    <label for="id_nueva_contraseña" class="form-label">Nueva contraseña</label>
+    {{ form.nueva_contraseña }}
+    {% if form.nueva_contraseña.errors %}
+      <div class="text-danger">
+        {% for error in form.nueva_contraseña.errors %}
+          <small>{{ error }}</small>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <button type="submit" class="btn btn-primary">Actualizar contraseña</button>
+</form>
+
+
+Nota: Django generará el ID automáticamente, como id_contrasenha_actual, a menos que lo hayas sobreescrito manualmente en el widget.
+
+✅ Cómo se ve el error
+
+Con esta configuración, si en tu vista haces:
+
+form.add_error('contrasenha_actual', 'La contraseña actual es incorrecta.')
+
+
+Entonces en la plantilla se mostrará justo debajo del campo correspondiente, así:
+
+<input type="password" name="contrasenha_actual" class="form-control">
+<div class="text-danger">
+  <small>La contraseña actual es incorrecta.</small>
+</div>

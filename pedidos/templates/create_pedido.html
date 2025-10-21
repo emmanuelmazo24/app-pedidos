@@ -14,7 +14,7 @@
           {% for field in form %}
             <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
               {% comment %} {% if field.label != 'Total' %} {% endcomment %}
-              <strong>{{ field.label }}</strong>          
+              <label for="{{field.id_for_label}}" class="form-label"><strong>{{ field.label }}</strong></label>        
               {{ field }}
               {% comment %} {% endif %} {% endcomment %}
               {% if field.errors %}
