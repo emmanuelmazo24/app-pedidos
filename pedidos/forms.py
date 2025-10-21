@@ -124,6 +124,29 @@ class PreciosIndumentariaForm(ModelForm):
                     'indumentaria': forms.Select(),
                     'precio_unitario': forms.NumberInput()}
 
+class MiCambioPasswordForm(forms.Form):
+    contraseña_actual = forms.CharField(
+        label="Contraseña actual",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+    nueva_contraseña = forms.CharField(
+        label="Nueva contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+    confirmar_contraseña = forms.CharField(
+        label="Confirmar nueva contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        nueva = cleaned_data.get("nueva_contraseña")
+        confirmar = cleaned_data.get("confirmar_contraseña")
+
+        if nueva and confirmar and nueva != confirmar:
+            raise forms.ValidationError("Las contraseñas nuevas no coinciden.")
+        return cleaned_data
+    
 # Inline Formset: permite manejar cabecera + detalle
 DetallePedidosFormSet = inlineformset_factory(
     Pedidos,

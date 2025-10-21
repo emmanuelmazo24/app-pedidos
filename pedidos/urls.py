@@ -19,6 +19,8 @@ urlpatterns = [
     path('precio_indumentaria/<int:precio_id>', views.precio_indumentaria, name='precio_indumentaria_edit'),
     path('del_precio/<int:precio_id>', views.del_precio, name='del_precio'),
     path('perfil/', views.pefil_user, name='perfil_user'),
+    path('cambiar_contraseha/', views.cambiar_contraseha, name='cambiar_contraseha'),
+    path('update_pass/', views.update_pass, name='update_pass'),
     path('crear-superusuario/', views.crear_superusuario),  # ruta temporal
 ]
 

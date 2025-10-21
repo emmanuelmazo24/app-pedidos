@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PedidosForm, PedidosDetalleForm, DetallePedidosFormSet, DetallePedidosEdFormSet,PreciosIndumentariaForm
+from .forms import PedidosForm, PedidosDetalleForm, DetallePedidosFormSet, DetallePedidosEdFormSet,PreciosIndumentariaForm,MiCambioPasswordForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate,update_session_auth_hash
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
 from .models import Pedidos, Profile_user,Pedidos_detalle, Pedidos_imagen,PreciosIndumentaria
@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from .utils import obtener_tipo_usuario
+from django.contrib import messages
 import os
 
 import cloudinary
@@ -67,26 +68,50 @@ def signin(request):
 
 @login_required
 def update_pass(request):
-    if request.method == 'POST':
-        usuario = request.user
-        if not usuario.check_password(request.POST["user_pass"]):
-            return render(request, 'perfil.html', {"error": "La contraseña actual es incorrecta."})
-        
-        if request.POST["user_pass_nv"] == request.POST["user_pass_nvr"]:
-            try:
-                user = User.objects.create_user(
-                    request.POST["username"], password=request.POST["password1"])
-                user.save()
-                Profile_user.objects.create(
-                    user=user,
-                    tipo_usuario = 'CLIENTE'
-                )
-                login(request, user)
-                return redirect('pedidos')
-            except IntegrityError:
-                return render(request, 'signup.html', {"form": UserCreationForm, "error": "Usuario ya existe."})
+  if request.method == 'POST':
+    user = request.user
+    if not user.check_password(request.POST["user_pass"]):
+        messages.error(request, "La contraseña actual es incorrecta.")
+        return render(request, 'perfil.html')
+      
+    if request.POST["user_pass_nv"] == request.POST["user_pass_nvr"]:
+      try:
+          user.set_password(request.POST["user_pass_nv"])
+          user.save()
+          update_session_auth_hash(request, user)  # Evita que se cierre la sesión
+          messages.success(request, 'Contraseña actualizada con éxito.')
+          #login(request, user)
+          return render(request, 'perfil.html')
+      except IntegrityError:
+        messages.error(request, "Error al validar")
+        return render(request, 'perfil.html')
+    else:
+      messages.error(request, 'Contraseña No son iguales.')
+      #login(request, user)
+      return render(request, 'perfil.html')
 
-            return render(request, 'signup.html', {"form": UserCreationForm, "error": "Verifique password."})  
+@login_required
+def cambiar_contraseha(request):
+    if request.method == 'POST':
+        form = MiCambioPasswordForm(request.POST)
+        if form.is_valid():
+            contraseña_actual = form.cleaned_data['contraseña_actual']
+            nueva_contraseña = form.cleaned_data['nueva_contraseña']
+            usuario = request.user
+
+            if not usuario.check_password(contraseña_actual):
+                form.add_error('contraseña_actual', 'La contraseña actual es incorrecta.')
+            else:
+                usuario.set_password(nueva_contraseña)
+                usuario.save()
+                update_session_auth_hash(request, usuario)  # Evita que se cierre la sesión
+                messages.success(request, 'Contraseña actualizada con éxito.')
+                return redirect('perfil_user')
+    else:
+        form = MiCambioPasswordForm()
+
+    return render(request, 'perfil.html', {'form': form})
+
 
 @login_required
 def signout(request):

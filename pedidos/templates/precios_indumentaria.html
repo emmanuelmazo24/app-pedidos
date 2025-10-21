@@ -3,44 +3,49 @@
 {% load humanize %}
 {% block content %}
 <div class="container">
-    <h1 class="text-center text-uppercase"><ion-icon name="cash-outline"></ion-icon> Precios Indumentarias</h1>
-    <div class="alert alert-danger {% if not error %}d-none {%endif%}" role="alert">    
-      {{error}}
+  <h1 class="text-center text-uppercase"><ion-icon name="cash-outline"></ion-icon> Precios Indumentarias</h1>
+  <div class="alert alert-danger {% if not error %}d-none {%endif%}" role="alert">    
+    {{error}}
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <form action="{% if form.instance.pk %}{% url 'precio_indumentaria_edit' form.instance.pk %}{% else %}{% url 'precio_indumentaria' %}{% endif %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-3">           
+              <label for="{{field.id_for_label}}" class="form-label"><strong>{{ field.label }}</strong></label>
+              {{ field|add_class:"form-control" }}
+              {% if field.errors %}
+                <div class="text-danger">{{ field.errors }}</div>
+              {% endif %}
+            </div>             
+          {% endfor %}
+          <button class="btn btn-primary"><ion-icon name="save-outline"></ion-icon> Grabar</button>
+      </form>
     </div>
-    <form action="{% if form.instance.pk %}{% url 'precio_indumentaria_edit' form.instance.pk %}{% else %}{% url 'precio_indumentaria' %}{% endif %}" method="POST" enctype="multipart/form-data">
-      {% csrf_token %}
-        {% for field in form %}
-          <div class="mb-3">           
-            <label for="{{field.id_for_label}}" class="form-label"><strong>{{ field.label }}</strong></label>
-            {{ field|add_class:"form-control" }}
-            {% if field.errors %}
-              <div class="text-danger">{{ field.errors }}</div>
-            {% endif %}
-          </div>             
-        {% endfor %}
-        <button class="btn btn-primary"><ion-icon name="save-outline"></ion-icon> Grabar</button>
-    </form>
-    <div class="container my-4">
-      <!-- Encabezado de la tabla -->
-      <div class="row bg-success fw-bold py-2 border-bottom">
-        <div class="col-sm-3"><strong>Calidad</strong></div>  
-        <div class="col-sm-3"><strong>Tipo</strong></div>     
-        <div class="col-sm-3"><strong>Precio</strong></div>
-        <div class="col-sm-3"></div>    
-      </div>
-      
-      <!-- Fila de datos -->
-      {% for precio in precios %}
-      <div class="row py-2 border-bottom bg-light">
-        <div class="col-sm-3">{{ precio.calidad}}</div>
-        <div class="col-sm-3">{{ precio.indumentaria}}</div>
-        <div class="col-sm-3">{{ precio.precio_unitario|intcomma}}</div> 
-        <div class="col-sm-3">
-          <a href="{% url 'precio_indumentaria_edit' precio.id %}"><ion-icon name="create-outline"></a>
-          <a href="{% url 'del_precio' precio.id %}"></ion-icon><ion-icon name="trash-outline"></ion-icon></a>
-        </div>        
-      </div>
-      {% endfor %}            
+  </div>
+    
+  <div class="container my-4">
+    <!-- Encabezado de la tabla -->
+    <div class="row bg-success fw-bold py-2 border-bottom">
+      <div class="col-sm-3"><strong>Calidad</strong></div>  
+      <div class="col-sm-3"><strong>Tipo</strong></div>     
+      <div class="col-sm-3"><strong>Precio</strong></div>
+      <div class="col-sm-3"></div>    
     </div>
+    
+    <!-- Fila de datos -->
+    {% for precio in precios %}
+    <div class="row py-2 border-bottom bg-light">
+      <div class="col-sm-3">{{ precio.calidad}}</div>
+      <div class="col-sm-3">{{ precio.indumentaria}}</div>
+      <div class="col-sm-3">{{ precio.precio_unitario|intcomma}}</div> 
+      <div class="col-sm-3">
+        <a href="{% url 'precio_indumentaria_edit' precio.id %}"><ion-icon name="create-outline"></a>
+        <a href="{% url 'del_precio' precio.id %}"></ion-icon><ion-icon name="trash-outline"></ion-icon></a>
+      </div>        
+    </div>
+    {% endfor %}            
+  </div>
 </div>
 {% endblock %}
