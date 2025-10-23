@@ -2,42 +2,94 @@
 
 {% block content %}
 
-<h1>Lista Pedidos</h1>
-<ul>
-    {% for pedido in pedidos %}
-        <li>
-            <strong>Nro.Pedido: {{ pedido.id }}</strong> {{ pedido.nombre }} - {{ pedido.contacto }} - {{ pedido.telefono }}
-            <br>
-            <em>Creado por: {{ pedido.user.username }}</em>
-            <strong> Descargar PDF</strong>
-            <a href="{% url 'pedidos_pdf' pedido.id %}" target="_blank"><ion-icon name="download-outline" ></ion-icon></a> 
-            <!-- <strong> Ver Detalle</strong>
-            <a href="{% url 'pedidos_detalle' pedido.id %}"><ion-icon name="eye-outline" ></ion-icon></a>            -->
-            <strong> Estado: {{ pedido.estado }}</strong>
+<div class="container">
+  <h1 class="text-center text-uppercase">Lista Pedidos</h1>
+  <div class="table-responsive text-center border-bottom bg-light">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>
+            <strong>Nro.Pedido</strong>
+          </th>
+          <th>
+            <strong>Pedido</strong>
+          </th>
+          <th>
+            <strong>Contacto</strong>
+          </th>
+          <th>
+            <strong>Telefono</strong>
+          </th>
+          <th>
+            <strong>Creado Por</strong>
+          </th>
+          <th>
+            <strong>PDF</strong>
+          </th>
+          <th>
+            <strong>Estado</strong>
+          </th>
+          <th>
+            
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for pedido in pedidos %}
+        <tr>
+          <td>
+            {{ pedido.id }}
+          </td>
+          <td>
+            {{ pedido.nombre }}
+          </td>
+          <td>
+            {{ pedido.contacto }}
+          </td>
+          <td>
+            {{ pedido.telefono }}
+          </td>
+          <td>
+            {{ pedido.user.username }}
+          </td>
+          <td>
+            <a href="{% url 'pedidos_pdf' pedido.id %}" target="_blank"><ion-icon name="download-outline" ></ion-icon></a>
+          </td>
+          <td>
             {% if pedido.estado == 'PENDIENTE' %}
             <a href="{% url 'pedidos_detalle' pedido.id %}">
                 <button>
-                    <strong> Modificar</strong>
+                    {{ pedido.estado }}
                     <ion-icon name="create-outline" ></ion-icon>
                 </button> 
-            </a>           
+            </a>   
+            {% else %}       
+            {{ pedido.estado }} 
             {% endif %}	
+          </td>
+          <td>
             {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
-                <form action="{% url 'pedidos_aprobar' pedido.id %}" method="POST">
-                {% csrf_token %}
-                <button>
-                    {% if pedido.estado == 'PENDIENTE' %}
-                    <strong> Aprobar Pedido?</strong>
-                    {% else %}
-                    <strong> Desaprobar Pedido?</strong>
-                    {% endif %}
-                    <ion-icon name="chevron-down-circle-outline"></ion-icon>
-                </button>
-                </form>    
+              <form action="{% url 'pedidos_aprobar' pedido.id %}" method="POST">
+              {% csrf_token %}
+              <button>
+                  {% if pedido.estado == 'PENDIENTE' %}
+                  <strong> Aprobar?</strong>
+                  {% else %}
+                  <strong> Desaprobar?</strong>
+                  {% endif %}
+                  <ion-icon name="chevron-down-circle-outline"></ion-icon>
+              </button>
+              </form>    
             {% endif %}
-        </li>
-    {% empty %}
-        <li>No hay pedidos disponibles.</li>
-    {% endfor %}
-</ul>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td>No hay pedidos disponibles.<</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

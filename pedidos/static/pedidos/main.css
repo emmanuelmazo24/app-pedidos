@@ -37,3 +37,6 @@ body::before {
     /* Asegura que la imagen esté detrás del contenido */
     z-index: -1; 
 }
+.portada {
+  background-image: url('../pedidos/images/vepa_bac.jpg');
+}
