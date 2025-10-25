@@ -37,6 +37,27 @@ body::before {
     /* Asegura que la imagen esté detrás del contenido */
     z-index: -1; 
 }
-.portada {
-  background-image: url('../pedidos/images/vepa_bac.jpg');
+.logo-central {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: contain;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+}
+.hero {
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                url('https://source.unsplash.com/random/1920x1080/?nature') center/cover;    
+}
+
+/* Ajuste en móvil */
+@media (max-width: 768px) {
+    .logo-central {
+        width: 55px;
+        height: 55px;
+    }
+    .hero h1 {
+        font-size: 2.5rem;
+    }
 }
