@@ -13,6 +13,7 @@
           {% csrf_token %}    
           <div class="row g-3">
           {% for field in form %}
+            {% if tipo_usuario == 'ADMIN' %}
               <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
                 <label for="{{field.id_for_label}}" class="form-label"><strong>{{ field.label }}</strong></label>
                 {% if field.label == 'Total' %}
@@ -23,7 +24,20 @@
                 {% if field.errors %}
                     <div class="text-danger">{{ field.errors }}</div>
                 {% endif %}
-              </div>             
+              </div>
+            {% elif tipo_usuario != 'ADMIN' and field.label not in 'Seña,Comprobante Seña' %} 
+              <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
+                <label for="{{field.id_for_label}}" class="form-label"><strong>{{ field.label }}</strong></label>
+                {% if field.label == 'Total' %}
+                  {{ field|intcomma}}
+                {% else %}
+                  {{ field }}
+                {% endif %}
+                {% if field.errors %}
+                    <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+              </div>
+            {% endif %}                
           {% endfor %}
           </div>         
           <div class="table-responsive p-2">
@@ -38,6 +52,7 @@
                       <th>{{ formSet.empty_form.molde.label|safe }}</th>
                       <th>{{ formSet.empty_form.cuello_tipo.label|safe }}</th>
                       <th>{{ formSet.empty_form.cuello_color.label|safe }}</th>
+                      <th>{{ formSet.empty_form.tipo_jugador.label|safe }}</th>
                       <th>{{ formSet.empty_form.observacion.label|safe }}</th>
                       <th>{{ formSet.empty_form.indumentaria.label|safe }}</th>
                       <th>{{ formSet.empty_form.calidad.label|safe }}</th>
@@ -56,6 +71,7 @@
                       <td>{{ f.molde }}</td>
                       <td>{{ f.cuello_tipo }}</td>
                       <td>{{ f.cuello_color }}</td>
+                      <td>{{ f.tipo_jugador }}</td>
                       <td>{{ f.observacion }}</td>
                       <td>{{ f.indumentaria }}</td>
                       <td>{{ f.calidad }}</td>
@@ -77,6 +93,7 @@
                   <td>{{ formSet.empty_form.molde }}</td>
                   <td>{{ formSet.empty_form.cuello_tipo }}</td>
                   <td>{{ formSet.empty_form.cuello_color }}</td>
+                  <td>{{ formSet.empty_form.tipo_jugador }}</td>
                   <td>{{ formSet.empty_form.observacion }}</td>
                   <td>{{ formSet.empty_form.indumentaria }}</td>
                   <td>{{ formSet.empty_form.calidad }}</td>

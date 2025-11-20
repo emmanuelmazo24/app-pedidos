@@ -18,7 +18,8 @@ TIPO_USER_CHOICES = [('CLIENTE','CLIENTE'),
 
 INDUMENTARIA_CHOICES = [('EQUIPO COMPLETO','EQUIPO COMPLETO'),
                     ('CAMISETA SOLA','CAMISETA SOLA'),
-                    ('CAMISETA Y SHORT','CAMISETA Y SHORT'),]
+                    ('CAMISETA Y SHORT','CAMISETA Y SHORT'),
+                    ('MEDIA SOLA','MEDIA SOLA')]
 
 TALLE_CHOICES = [('PP','PP'),
                  ('S','S'),
@@ -30,6 +31,10 @@ TALLE_CHOICES = [('PP','PP'),
 
 ESTADO_PED_CHOICES = [('PENDIENTE','PENDIENTE'),
                   ('APROBADO','APROBADO'),]
+
+TIPO_JUGADOR_CHOICES = [('ARQUERO','ARQUERO'),
+                  ('JUGADOR','JUGADOR'),
+                  ('SIN DATOS','SIN DATOS'),]
 
 # Create your models here.
 class Profile_user(models.Model):
@@ -48,7 +53,7 @@ class Pedidos(models.Model):
     fecha_modificacion = models.DateTimeField(auto_now=True)
     estado = models.CharField(max_length=20,choices=TIPO_USER_CHOICES,default='PENDIENTE')
     total = models.FloatField(default=0)
-    seña = models.FloatField(default=0)
+    senha = models.FloatField(default=0)
     saldo = models.FloatField(default=0)
     fecha_entrega = models.DateField(null=True, blank=True)
     img_jugadores = models.ImageField(upload_to='imagenes_pedidos/',
@@ -72,6 +77,9 @@ class Pedidos(models.Model):
     img_auspicio5 = models.ImageField(upload_to='imagenes_pedidos/',
         null=True,
         blank=True)
+    img_senha = models.ImageField(upload_to='imagenes_pedidos/',
+        null=True,
+        blank=True)
     
 class Pedidos_imagen(models.Model):
     pedido = models.ForeignKey(Pedidos, on_delete=models.CASCADE,related_name='detalles_imagen')
@@ -93,6 +101,7 @@ class Pedidos_detalle(models.Model):
     molde = models.CharField(max_length=15,choices=MOLDE_CHOICES)
     cuello_tipo = models.CharField(max_length=50,choices=CUELLO_CHOICES)
     cuello_color = models.CharField(max_length=15)
+    tipo_jugador = models.CharField(max_length=20,choices=TIPO_JUGADOR_CHOICES,default='SIN DATOS')
     observacion = models.CharField(max_length=200,blank=True)
     indumentaria = models.CharField(max_length=20,choices=INDUMENTARIA_CHOICES)
     calidad = models.CharField(max_length=20,choices=CALIDAD_CHOICES)

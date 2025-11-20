@@ -5,13 +5,15 @@ from django.contrib.auth.models import User
 class PedidosForm(ModelForm):
     class Meta:
         model = Pedidos
-        fields = ['nombre', 'contacto', 'telefono', 'total','descripcion','img_jugadores','img_arquero','img_auspicio1','img_auspicio2','img_auspicio3','img_auspicio4','img_auspicio5']
+        fields = ['nombre', 'contacto', 'telefono', 'total','senha','img_senha','descripcion','img_jugadores','img_arquero','img_auspicio1','img_auspicio2','img_auspicio3','img_auspicio4','img_auspicio5']
         labels = {
         'nombre': 'Pedido',
         'contacto': 'Contacto',
         'telefono': 'Teléfono',
         'descripcion': 'Descripción',
         'total': 'Total',
+        'senha': 'Seña',
+        'img_senha': 'Comprobante Seña',
         'img_jugadores': 'Diseño Jugadores',
         'img_arquero': 'Diseño Arquero',
         'img_auspicio1': 'Auspiciante 1',
@@ -45,6 +47,12 @@ class PedidosForm(ModelForm):
                   'total': forms.NumberInput(attrs={'readonly': 'readonly', 
                       'class': 'form-control'
                         }),
+                  'senha': forms.NumberInput(attrs={'readonly': 'readonly', 
+                      'class': 'form-control'
+                        }),
+                  'img_senha': forms.ClearableFileInput(attrs={
+                      'class': 'form-control',  
+                      }),
                   'img_jugadores': forms.ClearableFileInput(attrs={
                       'class': 'form-control',  
                       }),
@@ -90,7 +98,7 @@ class PedidoImagenForm(ModelForm):
 class PedidosDetalleForm(ModelForm):    
     class Meta:
       model = Pedidos_detalle
-      fields = ['id','nombre', 'talle', 'dorsal', 'molde', 'cuello_tipo', 'cuello_color', 'observacion', 'indumentaria','calidad', 'cantidad','precio_aprobado']
+      fields = ['id','nombre', 'talle', 'dorsal', 'molde', 'cuello_tipo', 'cuello_color', 'tipo_jugador', 'observacion', 'indumentaria','calidad', 'cantidad','precio_aprobado']
       labels = {
           'nombre': 'Nombre',
           'talle': 'Talle',
@@ -98,6 +106,7 @@ class PedidosDetalleForm(ModelForm):
           'molde': 'Molde',
           'cuello_tipo': 'Tipo de Cuello',
           'cuello_color': 'Color del Cuello',
+          'tipo_jugador': 'Tipo Jugador',
           'observacion': 'Observaciones',
           'indumentaria': 'Indumentaria',
           'calidad': 'Calidad',
@@ -108,6 +117,7 @@ class PedidosDetalleForm(ModelForm):
       widgets = { 'molde': forms.Select(),
                  'talle': forms.Select(),
                  'cuello_tipo': forms.Select(),
+                 'tipo_jugador': forms.Select(),
                  'calidad': forms.Select(),
                  'indumentaria': forms.Select(),
                  'cantidad': forms.NumberInput(attrs={'readonly': 'readonly'}),

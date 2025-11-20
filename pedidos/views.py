@@ -155,9 +155,11 @@ def pedidos(request):
 def crear_pedidos(request):
     if request.method == 'POST':
       try:
+        print(request.POST)
         form = PedidosForm(request.POST, request.FILES)
         formset = DetallePedidosFormSet(request.POST)
         if form.is_valid() and formset.is_valid():
+            print(request.POST)
             pedidos = form.save(commit=False)
             pedidos.user = request.user
             # upload_result = cloudinary.uploader.upload("",
@@ -182,6 +184,9 @@ def crear_pedidos(request):
             return redirect('index')  # Redirect to a success page or another view
       except ValueError as e:
         #print(f"Error al guardar el pedido: {e}")
+        form = PedidosForm()
+        pedido = Pedidos()
+        formset = DetallePedidosFormSet(instance=pedido)
         return render(request, 'create_pedido.html', {'form': form, 'formset': formset, 'error': 'Ocurrió un error al guardar el pedido. Por favor, intente de nuevo.'})
     else:
       form = PedidosForm()
@@ -278,6 +283,7 @@ def pedidos_pdf_view(request, pedido_id):
 
     # for img in pedidos_imagen:
     #     img.imagen_path = os.path.join(settings.MEDIA_ROOT, os.path.basename(img.imagen.name))
+    pedidos.img_senha_url = request.build_absolute_uri(pedidos.img_senha.url) if pedidos.img_senha else ''
     pedidos.img_jugadores_url = request.build_absolute_uri(pedidos.img_jugadores.url) if pedidos.img_jugadores else ''
     pedidos.img_arquero_url = request.build_absolute_uri(pedidos.img_arquero.url) if pedidos.img_arquero else ''
     pedidos.img_auspicio1_url = request.build_absolute_uri(pedidos.img_auspicio1.url) if pedidos.img_auspicio1 else ''

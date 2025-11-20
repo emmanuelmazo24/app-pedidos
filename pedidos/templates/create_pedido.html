@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="container">
   <h1 class="text-center text-uppercase"><ion-icon name="clipboard-outline"></ion-icon>Crear Pedidos</h1>
@@ -12,15 +13,23 @@
         {% csrf_token %}    
         <div class="row g-3">
           {% for field in form %}
+            {% if tipo_usuario == 'ADMIN' %}
             <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
-              {% comment %} {% if field.label != 'Total' %} {% endcomment %}
               <label for="{{field.id_for_label}}" class="form-label"><strong>{{ field.label }}</strong></label>        
-              {{ field }}
-              {% comment %} {% endif %} {% endcomment %}
+              {{ field }}              
               {% if field.errors %}
                 <div class="text-danger">{{ field.errors }}</div>
               {% endif %}
-            </div>             
+            </div>  
+            {% elif tipo_usuario != 'ADMIN' and field.label not in 'Seña,Comprobante Seña' %} 
+            <div class="{% if field.label == 'Descripción' %}col-md-12{% else %}col-md-6{% endif %}">
+              <label for="{{field.id_for_label}}" class="form-label"><strong>{{ field.label }}</strong></label>        
+              {{ field }}              
+              {% if field.errors %}
+                <div class="text-danger">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+            {% endif %}          
           {% endfor %}
         </div>         
         <!-- Contenedor para previsualización -->
@@ -46,6 +55,7 @@
                 <th>{{ f.molde.label|safe }}</th>
                 <th>{{ f.cuello_tipo.label|safe }}</th>
                 <th>{{ f.cuello_color.label|safe }}</th>
+                <th>{{ f.tipo_jugador.label|safe }}</th>
                 <th>{{ f.observacion.label|safe }}</th>
                 <th>{{ f.indumentaria.label|safe }}</th>
                 <th>{{ f.calidad.label|safe }}</th>
@@ -62,6 +72,7 @@
               <td>{{ f.molde }}</td>
               <td>{{ f.cuello_tipo }}</td>
               <td>{{ f.cuello_color }}</td>
+              <td>{{ f.tipo_jugador }}</td>
               <td>{{ f.observacion }}</td>
               <td>{{ f.indumentaria }}</td>
               <td>{{ f.calidad }}</td>
@@ -83,6 +94,7 @@
               <td>{{ formset.empty_form.molde }}</td>
               <td>{{ formset.empty_form.cuello_tipo }}</td>
               <td>{{ formset.empty_form.cuello_color }}</td>
+              <td>{{ formset.empty_form.tipo_jugador }}</td>
               <td>{{ formset.empty_form.observacion }}</td>
               <td>{{ formset.empty_form.indumentaria }}</td>
               <td>{{ formset.empty_form.calidad }}</td>
