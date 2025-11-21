@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Galería{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Filtro por categorías -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>Galería de Imágenes</h2>
+            <div class="btn-group" role="group">
+                <a href="{% url 'galeria_carrusel' %}" class="btn btn-outline-primary">
+                    Todas
+                </a>
+                {% for categoria in categorias %}
+                    <a href="{% url 'galeria_carrusel_categoria' categoria.id %}" 
+                       class="btn btn-outline-primary {% if categoria_actual == categoria %}active{% endif %}">
+                        {{ categoria.nombre }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Carrusel Bootstrap -->
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div id="carouselGaleria" class="carousel slide" data-bs-ride="carousel">
+                <!-- Indicadores -->
+                <div class="carousel-indicators">
+                    {% for imagen in imagenes %}
+                        <button type="button" data-bs-target="#carouselGaleria" 
+                                data-bs-slide-to="{{ forloop.counter0 }}" 
+                                {% if forloop.first %}class="active"{% endif %}
+                                aria-label="Slide {{ forloop.counter }}">
+                        </button>
+                    {% endfor %}
+                </div>
+
+                <!-- Imágenes -->
+                <div class="carousel-inner">
+                    {% for imagen in imagenes %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ imagen.imagen.url }}" class="d-block w-100" 
+                                 alt="{{ imagen.titulo }}" style="max-height: 500px; object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>{{ imagen.titulo }}</h5>
+                                <p>{{ imagen.descripcion }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Controles -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselGaleria" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselGaleria" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Galería en miniatura -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>Vista en Miniatura</h3>
+            <div class="row g-3">
+                {% for imagen in imagenes %}
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card h-100">
+                            <img src="{{ imagen.imagen.url }}" class="card-img-top" 
+                                 alt="{{ imagen.titulo }}" style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ imagen.titulo }}</h5>
+                                <p class="card-text">{{ imagen.descripcion|truncatewords:10 }}</p>
+                                <small class="text-muted">{{ imagen.categoria.nombre }}</small>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="alert alert-info">No hay imágenes disponibles</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

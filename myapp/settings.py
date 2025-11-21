@@ -20,6 +20,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Tamaño máximo de archivo
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Quick-start development settings - unsuitable for production
@@ -48,7 +52,8 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     # Aplicaciones de terceros
-    'widget_tweaks'
+    'widget_tweaks',
+    'galeria',
 ]
 
 MIDDLEWARE = [

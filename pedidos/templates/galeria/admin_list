@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Administrar Galería{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Administrar Galería</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'galeria_admin_create' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Nueva Imagen
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtro -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <select name="categoria" class="form-control" onchange="this.form.submit()">
+                        <option value="">Todas las categorías</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" 
+                                    {% if request.GET.categoria|add:"0"|add:"0" == categoria.id|add:"0" %}selected{% endif %}>
+                                {{ categoria.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Imagen</th>
+                    <th>Título</th>
+                    <th>Categoría</th>
+                    <th>Orden</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for imagen in imagenes %}
+                    <tr>
+                        <td>
+                            <img src="{{ imagen.imagen.url }}" alt="{{ imagen.titulo }}" 
+                                 style="width: 50px; height: 50px; object-fit: cover;">
+                        </td>
+                        <td>{{ imagen.titulo }}</td>
+                        <td>{{ imagen.categoria.nombre }}</td>
+                        <td>{{ imagen.orden }}</td>
+                        <td>
+                            {% if imagen.activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'galeria_admin_edit' imagen.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'galeria_admin_delete' imagen.id %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay imágenes</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

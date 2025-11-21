@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Imagen{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card border-danger">
+                <div class="card-body">
+                    <h4 class="card-title text-danger">¿Eliminar imagen?</h4>
+                    <img src="{{ imagen.imagen.url }}" class="img-thumbnail mb-3" 
+                         style="max-width: 100%; max-height: 300px;">
+                    <p><strong>Título:</strong> {{ imagen.titulo }}</p>
+                    <p class="text-warning">Esta acción no se puede deshacer</p>
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </form>
+                    <a href="{% url 'galeria_admin_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -552,3 +552,345 @@ Entonces en la plantilla se mostrará justo debajo del campo correspondiente, as
 <div class="text-danger">
   <small>La contraseña actual es incorrecta.</small>
 </div>
+# ============================================================================
+# OPCIÓN 1: USAR openpyxl (Recomendado - Moderno)
+# ============================================================================
+
+# Instalar: pip install openpyxl
+
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from datetime import datetime
+
+def exportar_detalle_excel_openpyxl(request):
+    """Exporta datos a Excel usando openpyxl"""
+    
+    # Obtener datos
+    from tu_app.models import Venta
+    ventas = Venta.objects.all()
+    
+    # Crear workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Ventas"
+    
+    # Definir estilos
+    encabezado_font = Font(bold=True, color="FFFFFF")
+    encabezado_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+    encabezado_alignment = Alignment(horizontal="center", vertical="center")
+    
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # Agregar encabezados
+    encabezados = ['ID', 'Cliente', 'Fecha', 'Monto Total', 'Estado']
+    ws.append(encabezados)
+    
+    # Aplicar estilos a encabezados
+    for cell in ws[1]:
+        cell.font = encabezado_font
+        cell.fill = encabezado_fill
+        cell.alignment = encabezado_alignment
+        cell.border = border
+    
+    # Agregar datos
+    for venta in ventas:
+        ws.append([
+            venta.id,
+            venta.cliente.razon_social,
+            venta.fecha.strftime('%d/%m/%Y'),
+            f"${venta.monto_total:.2f}",
+            venta.estado
+        ])
+    
+    # Aplicar estilos a datos
+    for row in ws.iter_rows(min_row=2, max_row=len(ventas)+1):
+        for cell in row:
+            cell.border = border
+            cell.alignment = Alignment(horizontal="left", vertical="center")
+    
+    # Ajustar ancho de columnas
+    ws.column_dimensions['A'].width = 10
+    ws.column_dimensions['B'].width = 25
+    ws.column_dimensions['C'].width = 15
+    ws.column_dimensions['D'].width = 15
+    ws.column_dimensions['E'].width = 12
+    
+    # Crear respuesta
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="ventas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+    
+    wb.save(response)
+    return response
+
+
+# ============================================================================
+# OPCIÓN 2: USAR xlsxwriter (Mejor para diseño)
+# ============================================================================
+
+# Instalar: pip install xlsxwriter
+
+from io import BytesIO
+
+def exportar_detalle_excel_xlsxwriter(request):
+    """Exporta datos a Excel usando xlsxwriter"""
+    
+    from tu_app.models import Venta
+    ventas = Venta.objects.all()
+    
+    # Crear buffer
+    output = BytesIO()
+    
+    # Crear workbook
+    from xlsxwriter import Workbook
+    workbook = Workbook(output)
+    worksheet = workbook.add_worksheet('Ventas')
+    
+    # Definir formatos
+    header_format = workbook.add_format({
+        'bold': True,
+        'bg_color': '#366092',
+        'font_color': 'white',
+        'border': 1,
+        'align': 'center',
+        'valign': 'vcenter'
+    })
+    
+    data_format = workbook.add_format({
+        'border': 1,
+        'align': 'left',
+        'valign': 'vcenter'
+    })
+    
+    money_format = workbook.add_format({
+        'border': 1,
+        'num_format': '$#,##0.00',
+        'align': 'right'
+    })
+    
+    date_format = workbook.add_format({
+        'border': 1,
+        'num_format': 'dd/mm/yyyy',
+        'align': 'center'
+    })
+    
+    # Encabezados
+    headers = ['ID', 'Cliente', 'Fecha', 'Monto', 'Estado']
+    for col, header in enumerate(headers):
+        worksheet.write(0, col, header, header_format)
+    
+    # Datos
+    for row, venta in enumerate(ventas, start=1):
+        worksheet.write(row, 0, venta.id, data_format)
+        worksheet.write(row, 1, venta.cliente.razon_social, data_format)
+        worksheet.write(row, 2, venta.fecha, date_format)
+        worksheet.write(row, 3, venta.monto_total, money_format)
+        worksheet.write(row, 4, venta.estado, data_format)
+    
+    # Ancho de columnas
+    worksheet.set_column('A:A', 10)
+    worksheet.set_column('B:B', 25)
+    worksheet.set_column('C:C', 15)
+    worksheet.set_column('D:D', 15)
+    worksheet.set_column('E:E', 12)
+    
+    workbook.close()
+    output.seek(0)
+    
+    response = HttpResponse(
+        output.read(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="ventas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+    
+    return response
+
+
+# ============================================================================
+# OPCIÓN 3: USAR csv (Simple)
+# ============================================================================
+
+import csv
+
+def exportar_detalle_csv(request):
+    """Exporta datos a CSV"""
+    
+    from tu_app.models import Venta
+    ventas = Venta.objects.all()
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="ventas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+    
+    writer = csv.writer(response, delimiter=';', quoting=csv.QUOTE_ALL)
+    
+    # Encabezados
+    writer.writerow(['ID', 'Cliente', 'Fecha', 'Monto Total', 'Estado'])
+    
+    # Datos
+    for venta in ventas:
+        writer.writerow([
+            venta.id,
+            venta.cliente.razon_social,
+            venta.fecha.strftime('%d/%m/%Y'),
+            venta.monto_total,
+            venta.estado
+        ])
+    
+    return response
+
+
+# ============================================================================
+# OPCIÓN 4: USAR pandas + openpyxl (Para análisis)
+# ============================================================================
+
+# Instalar: pip install pandas openpyxl
+
+import pandas as pd
+
+def exportar_detalle_pandas(request):
+    """Exporta datos a Excel usando pandas"""
+    
+    from tu_app.models import Venta
+    ventas = Venta.objects.all()
+    
+    # Crear DataFrame
+    data = {
+        'ID': [v.id for v in ventas],
+        'Cliente': [v.cliente.razon_social for v in ventas],
+        'Fecha': [v.fecha.strftime('%d/%m/%Y') for v in ventas],
+        'Monto Total': [v.monto_total for v in ventas],
+        'Estado': [v.estado for v in ventas]
+    }
+    
+    df = pd.DataFrame(data)
+    
+    # Crear buffer
+    output = BytesIO()
+    
+    # Escribir a Excel
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Ventas', index=False)
+        
+        # Obtener worksheet para formatear
+        worksheet = writer.sheets['Ventas']
+        for idx, col in enumerate(df.columns):
+            worksheet.column_dimensions[chr(65 + idx)].width = 20
+    
+    output.seek(0)
+    
+    response = HttpResponse(
+        output.read(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="ventas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+    
+    return response
+
+
+# ============================================================================
+# OPCIÓN 5: VISTA CON DETALLES (Con detalles de items)
+# ============================================================================
+
+def exportar_venta_con_detalles(request, venta_id):
+    """Exporta una venta completa con detalles de productos"""
+    
+    from tu_app.models import Venta, DetalleVenta
+    venta = Venta.objects.get(id=venta_id)
+    detalles = DetalleVenta.objects.filter(venta=venta)
+    
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Detalle Venta"
+    
+    # Encabezado principal
+    ws['A1'] = "DETALLE DE VENTA"
+    ws['A1'].font = Font(bold=True, size=14)
+    ws.merge_cells('A1:E1')
+    
+    # Información de la venta
+    ws['A3'] = "Número de Venta:"
+    ws['B3'] = venta.id
+    ws['A4'] = "Cliente:"
+    ws['B4'] = venta.cliente.razon_social
+    ws['A5'] = "Fecha:"
+    ws['B5'] = venta.fecha.strftime('%d/%m/%Y')
+    
+    # Encabezados de tabla
+    encabezados = ['Producto', 'Cantidad', 'Precio Unitario', 'Subtotal']
+    for col, header in enumerate(encabezados, 1):
+        ws.cell(row=7, column=col).value = header
+        ws.cell(row=7, column=col).font = Font(bold=True, color="FFFFFF")
+        ws.cell(row=7, column=col).fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+    
+    # Datos de detalles
+    total = 0
+    for row, detalle in enumerate(detalles, 8):
+        ws.cell(row=row, column=1).value = detalle.producto.nombre
+        ws.cell(row=row, column=2).value = detalle.cantidad
+        ws.cell(row=row, column=3).value = detalle.precio_unitario
+        ws.cell(row=row, column=4).value = detalle.subtotal
+        total += detalle.subtotal
+    
+    # Total
+    total_row = len(detalles) + 9
+    ws.cell(row=total_row, column=3).value = "TOTAL:"
+    ws.cell(row=total_row, column=3).font = Font(bold=True)
+    ws.cell(row=total_row, column=4).value = total
+    ws.cell(row=total_row, column=4).font = Font(bold=True)
+    
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="venta_{venta_id}_{datetime.now().strftime("%Y%m%d")}.xlsx"'
+    
+    wb.save(response)
+    return response
+
+
+# ============================================================================
+# URLS
+# ============================================================================
+
+# En tu_app/urls.py
+from django.urls import path
+from .views import (
+    exportar_detalle_excel_openpyxl,
+    exportar_detalle_excel_xlsxwriter,
+    exportar_detalle_csv,
+    exportar_detalle_pandas,
+    exportar_venta_con_detalles
+)
+
+urlpatterns = [
+    path('exportar/excel/openpyxl/', exportar_detalle_excel_openpyxl, name='export_excel_openpyxl'),
+    path('exportar/excel/xlsxwriter/', exportar_detalle_excel_xlsxwriter, name='export_excel_xlsxwriter'),
+    path('exportar/csv/', exportar_detalle_csv, name='export_csv'),
+    path('exportar/excel/pandas/', exportar_detalle_pandas, name='export_excel_pandas'),
+    path('exportar/venta/<int:venta_id>/excel/', exportar_venta_con_detalles, name='export_venta_detalle'),
+]
+
+
+# ============================================================================
+# TEMPLATE HTML
+# ============================================================================
+
+"""
+<a href="{% url 'export_excel_openpyxl' %}" class="btn btn-success">
+    <i class="fas fa-file-excel"></i> Exportar Excel
+</a>
+
+<a href="{% url 'export_csv' %}" class="btn btn-info">
+    <i class="fas fa-file-csv"></i> Exportar CSV
+</a>
+
+<a href="{% url 'export_venta_detalle' venta.id %}" class="btn btn-primary">
+    <i class="fas fa-download"></i> Descargar Detalle
+</a>
+"""
