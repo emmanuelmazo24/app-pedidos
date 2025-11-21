@@ -19,7 +19,8 @@ TIPO_USER_CHOICES = [('CLIENTE','CLIENTE'),
 INDUMENTARIA_CHOICES = [('EQUIPO COMPLETO','EQUIPO COMPLETO'),
                     ('CAMISETA SOLA','CAMISETA SOLA'),
                     ('CAMISETA Y SHORT','CAMISETA Y SHORT'),
-                    ('MEDIA SOLA','MEDIA SOLA')]
+                    ('MEDIA SOLA','MEDIA SOLA'),
+                    ('SHORT SOLA','SHORT SOLA')]
 
 TALLE_CHOICES = [('PP','PP'),
                  ('S','S'),

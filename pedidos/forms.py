@@ -5,12 +5,13 @@ from django.contrib.auth.models import User
 class PedidosForm(ModelForm):
     class Meta:
         model = Pedidos
-        fields = ['nombre', 'contacto', 'telefono', 'total','senha','img_senha','descripcion','img_jugadores','img_arquero','img_auspicio1','img_auspicio2','img_auspicio3','img_auspicio4','img_auspicio5']
+        fields = ['nombre', 'contacto', 'telefono', 'fecha_entrega', 'total','senha','img_senha','descripcion','img_jugadores','img_arquero','img_auspicio1','img_auspicio2','img_auspicio3','img_auspicio4','img_auspicio5']
         labels = {
         'nombre': 'Pedido',
         'contacto': 'Contacto',
         'telefono': 'Teléfono',
         'descripcion': 'Descripción',
+        'fecha_entrega': 'Fecha Entrega',
         'total': 'Total',
         'senha': 'Seña',
         'img_senha': 'Comprobante Seña',
@@ -44,11 +45,12 @@ class PedidosForm(ModelForm):
                       'placeholder': 'Indique alguna descripcion del pedido',
                       'rows': 4,                      
                   }),
+                  'fecha_entrega': forms.DateInput(attrs={'class': 'form-control'
+                        }),
                   'total': forms.NumberInput(attrs={'readonly': 'readonly', 
                       'class': 'form-control'
                         }),
-                  'senha': forms.NumberInput(attrs={'readonly': 'readonly', 
-                      'class': 'form-control'
+                  'senha': forms.NumberInput(attrs={'class': 'form-control'
                         }),
                   'img_senha': forms.ClearableFileInput(attrs={
                       'class': 'form-control',  

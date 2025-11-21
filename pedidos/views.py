@@ -154,12 +154,28 @@ def pedidos(request):
 @login_required
 def crear_pedidos(request):
     if request.method == 'POST':
-      try:
-        print(request.POST)
+      try:    
+        tipo_usuario = obtener_tipo_usuario(request.user)
         form = PedidosForm(request.POST, request.FILES)
         formset = DetallePedidosFormSet(request.POST)
+
+        if tipo_usuario != 'ADMIN':
+            form.fields['senha'].required = False
+                            
         if form.is_valid() and formset.is_valid():
-            print(request.POST)
+            # Contar formularios con datos
+            formularios_validos = 0
+            for form_data in formset:
+                if form_data.cleaned_data and any(form_data.cleaned_data.values()):
+                    formularios_validos += 1
+            
+            if formularios_validos == 0:
+                return render(request, 'create_pedido.html', {
+                    'form': form, 
+                    'formset': formset,
+                    'error': 'Debes agregar al menos un detalle del pedido'
+                })     
+              
             pedidos = form.save(commit=False)
             pedidos.user = request.user
             # upload_result = cloudinary.uploader.upload("",
@@ -170,7 +186,6 @@ def crear_pedidos(request):
             # Guardar los detalles del pedido
             pedidosDetalle = formset.save(commit=False)
             total_aprobado = 0            
-            #print(request.POST)
             #un nuevo comentario
             for detalle in pedidosDetalle:
                 detalle.pedido = pedidos
@@ -182,6 +197,19 @@ def crear_pedidos(request):
             pedidos.total = total_aprobado
             pedidos.save()
             return redirect('index')  # Redirect to a success page or another view
+        else:
+            error_messages = []
+            for field, errors in form.errors.items():
+                for error in errors:
+                    error_messages.append(f"{field}: {error}")  
+
+            for form_data in formset:      
+                for field, errors in form_data.errors.items():
+                    for error in errors:
+                        error_messages.append(f"{field}: {error}")                      
+
+            print("Errores:", error_messages)
+            return render(request, 'create_pedido.html', {'form': form, 'formset': formset, 'error': 'Por favor, completa el formulario correctamente.','errors_list': error_messages})
       except ValueError as e:
         #print(f"Error al guardar el pedido: {e}")
         form = PedidosForm()
@@ -309,8 +337,16 @@ def pedidos_pdf_view(request, pedido_id):
 def obtener_precio(request):
     indumentaria = request.GET.get('indumentaria')
     calidad = request.GET.get('calidad')
+    talle = request.GET.get('talle')
+    lis_indumentaria_remera = ['EQUIPO COMPLETO','CAMISETA SOLA']
+    lis_indumentaria_short = ['SHORT SOLA']
     try:
         precio = PreciosIndumentaria.objects.get(indumentaria=indumentaria, calidad=calidad).precio_unitario
+        if talle in ['XL','XXL','3XL']:
+            if indumentaria in lis_indumentaria_remera:
+                precio = precio + 10000
+            if indumentaria in lis_indumentaria_short:
+                precio = precio + 5000
     except PreciosIndumentaria.DoesNotExist:
         precio = 0
     return JsonResponse({'precio': precio})
