@@ -12,6 +12,10 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from .utils import obtener_tipo_usuario
 from django.contrib import messages
+
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from datetime import datetime
 import os
 
 # Create your views here.
@@ -195,6 +199,7 @@ def crear_pedidos(request):
                 total_aprobado += precio
             # Guardar la suma en la cabecera del pedido
             pedidos.total = total_aprobado
+            pedido.saldo = total_aprobado - pedido.senha
             pedidos.save()
             return redirect('index')  # Redirect to a success page or another view
         else:
@@ -252,7 +257,9 @@ def pedidos_detalle(request, pedido_id):
           form = PedidosForm(request.POST, instance=pedido)
       total_aprobado = 0
       formset = DetallePedidosEdFormSet(request.POST, instance=pedido)
- 
+
+      if tipo_usuario != 'ADMIN':
+            form.fields['senha'].required = False
       # print(form.is_valid())
       # print(formset.is_valid())
       # print(formset.errors)  # Muestra los errores de cada formulario en el formset
@@ -281,7 +288,22 @@ def pedidos_detalle(request, pedido_id):
               total_aprobado -= precio
           # Guardar la suma en la cabecera del pedido
           pedido.total = total_aprobado
+          pedido.saldo = total_aprobado - pedido.senha
           pedido.save()
+      else:
+        error_messages = []
+        for field, errors in form.errors.items():
+            for error in errors:
+                error_messages.append(f"{field}: {error}")  
+
+        for form_data in formset:      
+            for field, errors in form_data.errors.items():
+                for error in errors:
+                    error_messages.append(f"{field}: {error}")                      
+
+        print("Errores:", error_messages)
+        return render(request, 'pedidos_detalle.html', {'form': form, 'formset': formset, 'error': 'Por favor, completa el formulario correctamente.','errors_list': error_messages})
+      
       return redirect('pedidos')
     except ValueError:
         return render(request, 'pedidos_detalle.html', {'form': form, 'formSet': formset, 'error': 'Ocurrió un error al actualizar el pedido. Por favor, intente de nuevo.'})
@@ -406,3 +428,91 @@ def crear_superusuario(request):
         password='admin123'  # Usa una contraseña más segura en producción
     )
     return HttpResponse("Superusuario creado.")
+
+@login_required
+def exportar_detalle_excel_openpyxl(request,pedido_id):
+    """Exporta datos a Excel usando openpyxl"""
+    
+    # Obtener datos
+    tipo_usuario = obtener_tipo_usuario(request.user)
+           
+    if tipo_usuario == 'CLIENTE':
+        pedidos = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
+    else:
+        pedidos = get_object_or_404(Pedidos,pk=pedido_id)
+
+    pedidos_detalle = Pedidos_detalle.objects.filter(pedido=pedidos)    
+    
+    # Crear workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = f"Detalle del Pedido Nro. {pedido_id}"
+    
+    # Definir estilos
+    encabezado_font = Font(bold=True, color="FFFFFF")
+    encabezado_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+    encabezado_alignment = Alignment(horizontal="center", vertical="center")
+    
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # Agregar encabezados
+    encabezados = ['NOMBRE', 'TALLE', 'NRO DORSAL', 'MOLDE', 'TIPO CUELLO', 'COLOR CUELLO', 'TIPO JUGADOR', 'OBS', 'INDUMENTARIA', 'CALIDAD', 'CANTIDAD']
+    ws.append(encabezados)
+    
+    # Aplicar estilos a encabezados
+    for cell in ws[1]:
+        cell.font = encabezado_font
+        cell.fill = encabezado_fill
+        cell.alignment = encabezado_alignment
+        cell.border = border
+    
+    # Agregar datos
+    for detalle in pedidos_detalle:
+        ws.append([
+            detalle.nombre,
+            detalle.talle,
+            detalle.dorsal, #fecha.strftime('%d/%m/%Y')
+            detalle.molde,
+            detalle.cuello_tipo,
+            detalle.cuello_color,
+            detalle.tipo_jugador,
+            detalle.observacion,
+            detalle.indumentaria,
+            detalle.calidad,
+            detalle.cantidad
+            #f"${detalle.monto_total:.2f}",
+            #detalle.estado
+        ])
+    
+    # Aplicar estilos a datos
+    for row in ws.iter_rows(min_row=2, max_row=len(pedidos_detalle)+1):
+        for cell in row:
+            cell.border = border
+            cell.alignment = Alignment(horizontal="left", vertical="center")
+    
+    # Ajustar ancho de columnas
+    ws.column_dimensions['A'].width = 10
+    ws.column_dimensions['B'].width = 25
+    ws.column_dimensions['C'].width = 15
+    ws.column_dimensions['D'].width = 15
+    ws.column_dimensions['E'].width = 12
+    ws.column_dimensions['F'].width = 10
+    ws.column_dimensions['G'].width = 25
+    ws.column_dimensions['H'].width = 15
+    ws.column_dimensions['I'].width = 15
+    ws.column_dimensions['J'].width = 12
+    ws.column_dimensions['K'].width = 12
+
+    # Crear respuesta
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="detalle_pedido_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+    
+    wb.save(response)
+    return response

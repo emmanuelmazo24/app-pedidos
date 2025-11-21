@@ -53,6 +53,15 @@
             margin-top: 20px;
         }
 
+        .imagenes-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;     /* separación entre imágenes */
+        }
+
+        .imagen-item > div {
+            display: inline-block;
+        }
         /* Estilos específicos para la impresión (cuando se guarda como PDF) */
         @media print {
             body {
@@ -87,6 +96,8 @@
                 <p><strong>Cliente:</strong> {{pedidos.user.username}}</p>
                 <p><strong>Contacto:</strong> {{pedidos.contacto}}</p>
                 <p><strong>Teléfono:</strong> {{pedidos.telefono}}</p>
+                <p><strong>Fecha entrega:</strong> {{pedidos.fecha_entrega|date:"d/m/Y"}}</p>
+                <p><strong>descripción:</strong> {{pedidos.descripcion}}</p>
             </div>
         </header>
 
@@ -101,6 +112,7 @@
                         <th>Molde</th>
                         <th>T.Cuello</th>
                         <th>Color Cuello</th>
+                        <th>Tipo Jugador</th>
                         <th>indumentaria</th>
                         <th>Calidad</th>
                         {% if total_montos > 0 %}  
@@ -119,6 +131,7 @@
                         <td>{{item.molde}}</td>
                         <td>{{item.cuello_tipo}}</td>
                         <td>{{item.cuello_color}}</td>
+                        <td>{{item.tipo_jugador}}</td>
                         <td>{{item.indumentaria}}</td>
                         <td>{{item.calidad}}</td>
                         {% if total_montos > 0 %}  
@@ -134,23 +147,58 @@
         <section class="imagenes-pedido">
             <h2>Imágenes del Pedido</h2>
             <div class="imagenes-grid">
-              <div class="imagen-item">                
-                <img src="{{pedidos.img_jugadores_url}}" alt="Imagen Jugadores" style="{% if not pedidos.img_jugadores %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
-                <img src="{{pedidos.img_arquero_url}}" alt="Imagen Arquero" style="{% if not pedidos.img_arquero %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
-                <img src="{{pedidos.img_auspicio1_url}}" alt="Imagen auspicio 1" style="{% if not pedidos.img_auspicio1 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
-                <img src="{{pedidos.img_auspicio2_url}}" alt="Imagen auspicio 2" style="{% if not pedidos.img_auspicio2 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
-                <img src="{{pedidos.img_auspicio3_url}}" alt="Imagen auspicio 3" style="{% if not pedidos.img_auspicio3 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
-                <img src="{{pedidos.img_auspicio4_url}}" alt="Imagen auspicio 4" style="{% if not pedidos.img_auspicio4 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
-                <img src="{{pedidos.img_auspicio5_url}}" alt="Imagen auspicio 5" style="{% if not pedidos.img_auspicio5 %}display:None;{% endif %} width:200px; height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 4px;">
+              <div class="imagen-item">              
+                <div class="text-center" style="{% if not pedidos.img_jugadores %}display:none;{% endif %}">
+                    <img src="{{pedidos.img_jugadores_url}}" alt="Imagen Jugadores"
+                         style="width:200px; height:200px; border:1px solid #ccc; border-radius:4px; padding:4px;">
+                    <p class="fw-bold mt-1">Jugadores</p>
+                </div>
+    
+                <div class="text-center" style="{% if not pedidos.img_arquero %}display:none;{% endif %}">
+                    <img src="{{pedidos.img_arquero_url}}" alt="Imagen Arquero"
+                         style="width:200px; height:200px; border:1px solid #ccc; border-radius:4px; padding:4px;">
+                    <p class="fw-bold mt-1">Arquero</p>
+                </div>
+    
+                <div class="text-center" style="{% if not pedidos.img_auspicio1 %}display:none;{% endif %}">
+                    <img src="{{pedidos.img_auspicio1_url}}" alt="Imagen auspicio 1"
+                         style="width:200px; height:200px; border:1px solid #ccc; border-radius:4px; padding:4px;">
+                    <p class="fw-bold mt-1">Auspicio 1</p>
+                </div>
+    
+                <div class="text-center" style="{% if not pedidos.img_auspicio2 %}display:none;{% endif %}">
+                    <img src="{{pedidos.img_auspicio2_url}}" alt="Imagen auspicio 2"
+                         style="width:200px; height:200px; border:1px solid #ccc; border-radius:4px; padding:4px;">
+                    <p class="fw-bold mt-1">Auspicio 2</p>
+                </div>
+    
+                <div class="text-center" style="{% if not pedidos.img_auspicio3 %}display:none;{% endif %}">
+                    <img src="{{pedidos.img_auspicio3_url}}" alt="Imagen auspicio 3"
+                         style="width:200px; height:200px; border:1px solid #ccc; border-radius:4px; padding:4px;">
+                    <p class="fw-bold mt-1">Auspicio 3</p>
+                </div>
+    
+                <div class="text-center" style="{% if not pedidos.img_auspicio4 %}display:none;{% endif %}">
+                    <img src="{{pedidos.img_auspicio4_url}}" alt="Imagen auspicio 4"
+                         style="width:200px; height:200px; border:1px solid #ccc; border-radius:4px; padding:4px;">
+                    <p class="fw-bold mt-1">Auspicio 4</p>
+                </div>
+    
+                <div class="text-center" style="{% if not pedidos.img_auspicio5 %}display:none;{% endif %}">
+                    <img src="{{pedidos.img_auspicio5_url}}" alt="Imagen auspicio 5"
+                         style="width:200px; height:200px; border:1px solid #ccc; border-radius:4px; padding:4px;">
+                    <p class="fw-bold mt-1">Auspicio 5</p>
+                </div>
               </div>
             </div>  
         </section>  
         {% if total_montos > 0 %}      
         <footer>
             <div class="totales">
-                {% comment %} <p><strong>Subtotal:</strong> $2,100.00</p>
-                <p><strong>IVA (16%):</strong> $336.00</p> {% endcomment %}
+                {% comment %} <p><strong>Subtotal:</strong> $2,100.00</p>{% endcomment %}
+                <p><strong>SEÑA:</strong> Gs.{{ pedidos.senha|floatformat:0|intcomma }}</p>
                 <h3><strong>TOTAL:</strong> Gs.{{ total_montos|floatformat:0|intcomma }}</h3>
+                <h3><strong>SALDO:</strong> Gs.{{ pedidos.saldo|floatformat:0|intcomma }}</h3>
             </div>
         </footer>
         {% endif %}

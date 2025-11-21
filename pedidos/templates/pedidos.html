@@ -27,6 +27,9 @@
             <strong>PDF</strong>
           </th>
           <th>
+            <strong>XLS</strong>
+          </th>
+          <th>
             <strong>Estado</strong>
           </th>
           <th>
@@ -54,6 +57,9 @@
           </td>
           <td>
             <a href="{% url 'pedidos_pdf' pedido.id %}" target="_blank"><ion-icon name="download-outline" ></ion-icon></a>
+          </td>
+          <td>
+            <a href="{% url 'pedidos_xls' pedido.id %}" target="_blank"><ion-icon name="download-outline" ></ion-icon></a>
           </td>
           <td>
             {% if pedido.estado == 'PENDIENTE' %}
