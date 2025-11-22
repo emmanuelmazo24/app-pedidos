@@ -45,7 +45,7 @@ class PedidosForm(ModelForm):
                       'placeholder': 'Indique alguna descripcion del pedido',
                       'rows': 4,                      
                   }),
-                  'fecha_entrega': forms.DateInput(attrs={'class': 'form-control'
+                  'fecha_entrega': forms.DateInput(attrs={'class': 'form-control','type': 'date'
                         }),
                   'total': forms.NumberInput(attrs={'readonly': 'readonly', 
                       'class': 'form-control'

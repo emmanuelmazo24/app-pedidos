@@ -18,6 +18,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from datetime import datetime
 import os
+from datetime import date, timedelta
 
 # Create your views here.
 def index(request):
@@ -159,7 +160,9 @@ def pedidos(request):
     #     pedidos = Pedidos.objects.filter(user=request.user)
     # else:
     #     pedidos = Pedidos.objects.all()
-    return render(request, 'pedidos.html', {'pedidos': pedidos})
+    hoy = date.today()
+    hoy_fin = date.today() + timedelta(days=3)
+    return render(request, 'pedidos.html', {'pedidos': pedidos, "hoy": hoy, "hoy_fin": hoy_fin})
 
 @login_required
 def crear_pedidos(request):

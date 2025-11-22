@@ -23,6 +23,11 @@
           <th>
             <strong>Creado Por</strong>
           </th>
+          {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
+          <th>
+            <strong>Fecha Entrega</strong>
+          </th>
+          {% endif %}
           <th>
             <strong>PDF</strong>
           </th>
@@ -57,6 +62,13 @@
           <td>
             {{ pedido.user.username }}
           </td>
+          {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
+          <td>
+            <div  class="{% if pedido.fecha_entrega > hoy and pedido.fecha_entrega > hoy_fin %}blink-cell{% endif %}">
+              {{ pedido.fecha_entrega|date:"d/m/Y" }}
+            </div>            
+          </td>
+          {% endif %}
           <td>
             <a href="{% url 'pedidos_pdf' pedido.id %}" target="_blank"><ion-icon name="download-outline" ></ion-icon></a>
           </td>
