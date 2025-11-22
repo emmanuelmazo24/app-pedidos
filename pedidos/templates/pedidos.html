@@ -64,7 +64,7 @@
           </td>
           {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
           <td>
-            <div  class="{% if pedido.fecha_entrega > hoy and pedido.fecha_entrega > hoy_fin %}blink-cell{% endif %}">
+            <div  class="{% if pedido.fecha_entrega >= hoy and pedido.fecha_entrega <= hoy_fin %}blink-cell{% endif %}">
               {{ pedido.fecha_entrega|date:"d/m/Y" }}
             </div>            
           </td>

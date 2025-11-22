@@ -208,7 +208,7 @@ def crear_pedidos(request):
                 total_aprobado += precio
             # Guardar la suma en la cabecera del pedido
             pedidos.total = total_aprobado
-            pedido.saldo = total_aprobado - pedido.senha
+            pedidos.saldo = total_aprobado - pedidos.senha
             pedidos.save()
             return redirect('index')  # Redirect to a success page or another view
         else:
