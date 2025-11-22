@@ -6,6 +6,10 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # Público
+    # path('carrusel/', views.galeria_carrusel, name='galeria_carrusel'),
+    # path('carrusel/<int:categoria_id>/', views.galeria_carrusel, name='galeria_carrusel_categoria'),
+    # path('api/imagenes/', views.api_galeria_images, name='api_galeria_images'),
+    # path('api/imagenes/<int:categoria_id>/', views.api_galeria_images, name='api_galeria_images_categoria'),
     path('carrusel/', views.galeria_carrusel, name='galeria_carrusel'),
     path('carrusel/<int:categoria_id>/', views.galeria_carrusel, name='galeria_carrusel_categoria'),
     path('api/imagenes/', views.api_galeria_images, name='api_galeria_images'),

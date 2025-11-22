@@ -26,9 +26,11 @@
           <th>
             <strong>PDF</strong>
           </th>
+          {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
           <th>
             <strong>XLS</strong>
           </th>
+          {% endif %}
           <th>
             <strong>Estado</strong>
           </th>
@@ -58,9 +60,11 @@
           <td>
             <a href="{% url 'pedidos_pdf' pedido.id %}" target="_blank"><ion-icon name="download-outline" ></ion-icon></a>
           </td>
+          {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
           <td>
             <a href="{% url 'pedidos_xls' pedido.id %}" target="_blank"><ion-icon name="download-outline" ></ion-icon></a>
           </td>
+          {% endif %}
           <td>
             {% if pedido.estado == 'PENDIENTE' %}
             <a href="{% url 'pedidos_detalle' pedido.id %}">

@@ -6,6 +6,7 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
 from .models import Pedidos, Profile_user,Pedidos_detalle, Pedidos_imagen,PreciosIndumentaria
+from galeria.models import Galeria
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 from django.http import HttpResponse, JsonResponse
@@ -20,7 +21,12 @@ import os
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    """Muestra el carrusel de imágenes"""
+    
+    imagenes = Galeria.objects.filter(activo=True).order_by('orden')    
+    return render(request, 'index.html', {
+        'imagenes': imagenes
+    })
 
 def signup(request):
     if request.method == 'GET':

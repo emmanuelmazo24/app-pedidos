@@ -15,7 +15,7 @@ def galeria_carrusel(request, categoria_id=None):
             activo=True
         ).order_by('orden')
         categorias = Categoria.objects.all()
-        return render(request, 'galeria/carrusel.html', {
+        return render(request, 'index.html', { #'galeria/carrusel.html'
             'imagenes': imagenes,
             'categoria_actual': categoria,
             'categorias': categorias
@@ -23,7 +23,7 @@ def galeria_carrusel(request, categoria_id=None):
     else:
         imagenes = Galeria.objects.filter(activo=True).order_by('orden')
         categorias = Categoria.objects.all()
-        return render(request, 'galeria/carrusel.html', {
+        return render(request, 'index.html', {
             'imagenes': imagenes,
             'categorias': categorias
         })
