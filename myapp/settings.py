@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure--c3s1^eg^hiq0loog_(bg&w#sr@e2o5s24yz&cp^=6&o7hulr7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['emanuelito.pythonanywhere.com']
 
 
 # Application definition
@@ -74,7 +74,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # Agrega tu context processor aquí
-                'pedidos.context_processors.tipo_usuario_context', 
+                'pedidos.context_processors.tipo_usuario_context',
             ],
         },
     },
@@ -88,8 +88,12 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'emanuelito$pedidos',
+        'USER':'emanuelito',
+        'PASSWORD':'My1986**',
+        'HOST':'emanuelito.mysql.pythonanywhere-services.com',
+        'PORT':'3306',
     }
 }
 
