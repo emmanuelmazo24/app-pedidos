@@ -23,8 +23,8 @@ from datetime import date, timedelta
 # Create your views here.
 def index(request):
     """Muestra el carrusel de imágenes"""
-    
-    imagenes = Galeria.objects.filter(activo=True).order_by('orden')    
+
+    imagenes = Galeria.objects.filter(activo=True).order_by('orden')
     return render(request, 'index.html', {
         'imagenes': imagenes
     })
@@ -48,7 +48,7 @@ def signup(request):
             except IntegrityError:
                 return render(request, 'signup.html', {"form": UserCreationForm, "error": "Usuario ya existe."})
 
-        return render(request, 'signup.html', {"form": UserCreationForm, "error": "Verifique password."})  
+        return render(request, 'signup.html', {"form": UserCreationForm, "error": "Verifique password."})
 
 def signin(request):
     if request.method == 'GET':
@@ -76,7 +76,7 @@ def update_password(request):
         form = MiCambioPasswordForm(request.POST)
         if form.is_valid():
             contrasenha_actual = form.cleaned_data['contrasenha_actual']
-            nueva_contrasenha = form.cleaned_data['nueva_contrasenha']            
+            nueva_contrasenha = form.cleaned_data['nueva_contrasenha']
             usuario = request.user
 
             if not usuario.check_password(contrasenha_actual):
@@ -114,7 +114,7 @@ def update_pass(request):
     if not user.check_password(request.POST["user_pass"]):
         messages.error(request, "La contraseña actual es incorrecta.")
         return render(request, 'perfil.html')
-      
+
     if request.POST["user_pass_nv"] == request.POST["user_pass_nvr"]:
       try:
           user.set_password(request.POST["user_pass_nv"])
@@ -140,7 +140,7 @@ def signout(request):
 def pedidos(request):
     #profiles = Profile_user.objects.filter(user = request.user)
     tipo_usuario = obtener_tipo_usuario(request.user)
-    # if profiles.exists():        
+    # if profiles.exists():
     #     for profile in profiles:
     #         tipo_usuario = profile.tipo_usuario
     #         if profile.tipo_usuario == 'CLIENTE':
@@ -167,28 +167,28 @@ def pedidos(request):
 @login_required
 def crear_pedidos(request):
     if request.method == 'POST':
-      try:    
+      try:
         tipo_usuario = obtener_tipo_usuario(request.user)
         form = PedidosForm(request.POST, request.FILES)
         formset = DetallePedidosFormSet(request.POST)
 
         if tipo_usuario != 'ADMIN':
             form.fields['senha'].required = False
-                            
+
         if form.is_valid() and formset.is_valid():
             # Contar formularios con datos
             formularios_validos = 0
             for form_data in formset:
                 if form_data.cleaned_data and any(form_data.cleaned_data.values()):
                     formularios_validos += 1
-            
+
             if formularios_validos == 0:
                 return render(request, 'create_pedido.html', {
-                    'form': form, 
+                    'form': form,
                     'formset': formset,
                     'error': 'Debes agregar al menos un detalle del pedido'
-                })     
-              
+                })
+
             pedidos = form.save(commit=False)
             pedidos.user = request.user
             # upload_result = cloudinary.uploader.upload("",
@@ -198,7 +198,7 @@ def crear_pedidos(request):
             pedidos.save()
             # Guardar los detalles del pedido
             pedidosDetalle = formset.save(commit=False)
-            total_aprobado = 0            
+            total_aprobado = 0
             #un nuevo comentario
             for detalle in pedidosDetalle:
                 detalle.pedido = pedidos
@@ -208,19 +208,19 @@ def crear_pedidos(request):
                 total_aprobado += precio
             # Guardar la suma en la cabecera del pedido
             pedidos.total = total_aprobado
-            pedido.saldo = total_aprobado - pedido.senha
+            pedidos.saldo = total_aprobado - pedidos.senha
             pedidos.save()
             return redirect('index')  # Redirect to a success page or another view
         else:
             error_messages = []
             for field, errors in form.errors.items():
                 for error in errors:
-                    error_messages.append(f"{field}: {error}")  
+                    error_messages.append(f"{field}: {error}")
 
-            for form_data in formset:      
+            for form_data in formset:
                 for field, errors in form_data.errors.items():
                     for error in errors:
-                        error_messages.append(f"{field}: {error}")                      
+                        error_messages.append(f"{field}: {error}")
 
             print("Errores:", error_messages)
             return render(request, 'create_pedido.html', {'form': form, 'formset': formset, 'error': 'Por favor, completa el formulario correctamente.','errors_list': error_messages})
@@ -233,13 +233,13 @@ def crear_pedidos(request):
     else:
       form = PedidosForm()
       pedido = Pedidos()
-      formset = DetallePedidosFormSet(instance=pedido)      
+      formset = DetallePedidosFormSet(instance=pedido)
       return render(request, 'create_pedido.html', {'form': form, 'formset': formset})
 
 @login_required
 def pedidos_detalle(request, pedido_id):
   tipo_usuario = obtener_tipo_usuario(request.user)
-  if request.method == 'GET':          
+  if request.method == 'GET':
     if tipo_usuario == 'CLIENTE':
         pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
     else:
@@ -253,13 +253,13 @@ def pedidos_detalle(request, pedido_id):
     else:
         return redirect('pedidos')
   else:
-    try:         
+    try:
       if tipo_usuario == 'CLIENTE':
           pedido = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
       else:
           pedido = get_object_or_404(Pedidos,pk=pedido_id)
-              
-      
+
+
       if request.FILES:
           form = PedidosForm(request.POST, request.FILES, instance=pedido)
       else:
@@ -273,23 +273,23 @@ def pedidos_detalle(request, pedido_id):
       # print(formset.is_valid())
       # print(formset.errors)  # Muestra los errores de cada formulario en el formset
       #print(formset.non_form_errors())  # Muestra errores generales del formset
-      if form.is_valid() and formset.is_valid():            
+      if form.is_valid() and formset.is_valid():
           #print('valido')
           form.save()
           # Guardar los detalles del pedido
           pedidosDetalle = formset.save(commit=False)
           #print(pedidosDetalle)
-          for detalle in pedidosDetalle:  
-              #print('actualiza detalle')              
+          for detalle in pedidosDetalle:
+              #print('actualiza detalle')
               detalle.pedido = pedido
               precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
               detalle.precio_aprobado = precio
-              detalle.save()                
+              detalle.save()
 
           pedidosDetalle = Pedidos_detalle.objects.filter(pedido=pedido)
           for detalle in pedidosDetalle:
               total_aprobado += detalle.precio_aprobado
-          # Eliminar los detalles marcados para eliminación         
+          # Eliminar los detalles marcados para eliminación
           for detalle in formset.deleted_objects:
               #print(detalle)
               precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
@@ -303,16 +303,16 @@ def pedidos_detalle(request, pedido_id):
         error_messages = []
         for field, errors in form.errors.items():
             for error in errors:
-                error_messages.append(f"{field}: {error}")  
+                error_messages.append(f"{field}: {error}")
 
-        for form_data in formset:      
+        for form_data in formset:
             for field, errors in form_data.errors.items():
                 for error in errors:
-                    error_messages.append(f"{field}: {error}")                      
+                    error_messages.append(f"{field}: {error}")
 
         print("Errores:", error_messages)
         return render(request, 'pedidos_detalle.html', {'form': form, 'formset': formset, 'error': 'Por favor, completa el formulario correctamente.','errors_list': error_messages})
-      
+
       return redirect('pedidos')
     except ValueError:
         return render(request, 'pedidos_detalle.html', {'form': form, 'formSet': formset, 'error': 'Ocurrió un error al actualizar el pedido. Por favor, intente de nuevo.'})
@@ -331,14 +331,14 @@ def render_to_pdf(template_src, context_dict={}):
 def pedidos_pdf_view(request, pedido_id):
     #profiles = Profile_user.objects.filter(user = request.user)
     tipo_usuario = obtener_tipo_usuario(request.user)
-           
+
     if tipo_usuario == 'CLIENTE':
         pedidos = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
     else:
         pedidos = get_object_or_404(Pedidos,pk=pedido_id)
 
     pedidos_detalle = Pedidos_detalle.objects.filter(pedido=pedidos)
-    #pedidos_imagen = Pedidos_imagen.objects.filter(pedido=pedidos)  
+    #pedidos_imagen = Pedidos_imagen.objects.filter(pedido=pedidos)
 
     # for img in pedidos_imagen:
     #     img.imagen_path = os.path.join(settings.MEDIA_ROOT, os.path.basename(img.imagen.name))
@@ -352,13 +352,13 @@ def pedidos_pdf_view(request, pedido_id):
     pedidos.img_auspicio5_url = request.build_absolute_uri(pedidos.img_auspicio5.url) if pedidos.img_auspicio5 else ''
 
     # for img in pedidos_imagen:
-    #     img.imagen_url = request.build_absolute_uri(img.imagen.url)  
+    #     img.imagen_url = request.build_absolute_uri(img.imagen.url)
 
     total_montos = sum([d.precio_aprobado * d.cantidad for d in pedidos_detalle])
-    
+
     context = {
         "pedidos": pedidos,
-        "pedidos_detalle": pedidos_detalle,        
+        "pedidos_detalle": pedidos_detalle,
         "total_montos": total_montos,
     }
     #return render_to_pdf('pedido_pdf_template.html', context)
@@ -398,7 +398,7 @@ def precio_indumentaria(request,precio_id=None):
   else:
     precio = None
 
-  if request.method == 'POST':    
+  if request.method == 'POST':
     form = PreciosIndumentariaForm(request.POST, instance=precio)
     if form.is_valid():
         precio_form = form.save(commit=False)
@@ -408,9 +408,9 @@ def precio_indumentaria(request,precio_id=None):
     else:
         error = "Ocurrió un error al procesar el formulario."
   else:
-    form = PreciosIndumentariaForm(instance=precio) 
+    form = PreciosIndumentariaForm(instance=precio)
 
-  precios = PreciosIndumentaria.objects.all() 
+  precios = PreciosIndumentaria.objects.all()
   context = {
       'form': form,
       'precios': precios,
@@ -441,45 +441,45 @@ def crear_superusuario(request):
 @login_required
 def exportar_detalle_excel_openpyxl(request,pedido_id):
     """Exporta datos a Excel usando openpyxl"""
-    
+
     # Obtener datos
     tipo_usuario = obtener_tipo_usuario(request.user)
-           
+
     if tipo_usuario == 'CLIENTE':
         pedidos = get_object_or_404(Pedidos, pk=pedido_id, user=request.user)
     else:
         pedidos = get_object_or_404(Pedidos,pk=pedido_id)
 
-    pedidos_detalle = Pedidos_detalle.objects.filter(pedido=pedidos)    
-    
+    pedidos_detalle = Pedidos_detalle.objects.filter(pedido=pedidos)
+
     # Crear workbook
     wb = Workbook()
     ws = wb.active
     ws.title = f"Detalle del Pedido Nro. {pedido_id}"
-    
+
     # Definir estilos
     encabezado_font = Font(bold=True, color="FFFFFF")
     encabezado_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
     encabezado_alignment = Alignment(horizontal="center", vertical="center")
-    
+
     border = Border(
         left=Side(style='thin'),
         right=Side(style='thin'),
         top=Side(style='thin'),
         bottom=Side(style='thin')
     )
-    
+
     # Agregar encabezados
     encabezados = ['NOMBRE', 'TALLE', 'NRO DORSAL', 'MOLDE', 'TIPO CUELLO', 'COLOR CUELLO', 'TIPO JUGADOR', 'OBS', 'INDUMENTARIA', 'CALIDAD', 'CANTIDAD']
     ws.append(encabezados)
-    
+
     # Aplicar estilos a encabezados
     for cell in ws[1]:
         cell.font = encabezado_font
         cell.fill = encabezado_fill
         cell.alignment = encabezado_alignment
         cell.border = border
-    
+
     # Agregar datos
     for detalle in pedidos_detalle:
         ws.append([
@@ -497,13 +497,13 @@ def exportar_detalle_excel_openpyxl(request,pedido_id):
             #f"${detalle.monto_total:.2f}",
             #detalle.estado
         ])
-    
+
     # Aplicar estilos a datos
     for row in ws.iter_rows(min_row=2, max_row=len(pedidos_detalle)+1):
         for cell in row:
             cell.border = border
             cell.alignment = Alignment(horizontal="left", vertical="center")
-    
+
     # Ajustar ancho de columnas
     ws.column_dimensions['A'].width = 10
     ws.column_dimensions['B'].width = 25
@@ -522,6 +522,6 @@ def exportar_detalle_excel_openpyxl(request,pedido_id):
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = f'attachment; filename="detalle_pedido_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
-    
+
     wb.save(response)
     return response

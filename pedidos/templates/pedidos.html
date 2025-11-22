@@ -40,7 +40,7 @@
             <strong>Estado</strong>
           </th>
           <th>
-            
+
           </th>
         </tr>
       </thead>
@@ -64,9 +64,9 @@
           </td>
           {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
           <td>
-            <div  class="{% if pedido.fecha_entrega > hoy and pedido.fecha_entrega > hoy_fin %}blink-cell{% endif %}">
+            <div  class="{% if pedido.fecha_entrega >= hoy and pedido.fecha_entrega <= hoy_fin %}blink-cell{% endif %}">
               {{ pedido.fecha_entrega|date:"d/m/Y" }}
-            </div>            
+            </div>
           </td>
           {% endif %}
           <td>
@@ -83,11 +83,11 @@
                 <button>
                     {{ pedido.estado }}
                     <ion-icon name="create-outline" ></ion-icon>
-                </button> 
-            </a>   
-            {% else %}       
-            {{ pedido.estado }} 
-            {% endif %}	
+                </button>
+            </a>
+            {% else %}
+            {{ pedido.estado }}
+            {% endif %}
           </td>
           <td>
             {% if tipo_usuario == 'ADMIN' or tipo_usuario == 'VENDEDOR'%}
@@ -101,7 +101,7 @@
                   {% endif %}
                   <ion-icon name="chevron-down-circle-outline"></ion-icon>
               </button>
-              </form>    
+              </form>
             {% endif %}
           </td>
         </tr>
