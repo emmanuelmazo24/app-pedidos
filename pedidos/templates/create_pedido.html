@@ -193,9 +193,11 @@
   document.querySelectorAll('.formset-row').forEach(row => {
     const indumentariaSelect = row.querySelector('[name$="-indumentaria"]');
     const calidadSelect = row.querySelector('[name$="-calidad"]');
-    if (indumentariaSelect && calidadSelect) {
+    const talleSelect = row.querySelector('[name$="-talle"]');
+    if (indumentariaSelect && calidadSelect && talleSelect) {
       indumentariaSelect.addEventListener('change', () => actualizarPrecio(row));
       calidadSelect.addEventListener('change', () => actualizarPrecio(row));
+      talleSelect.addEventListener('change', () => actualizarPrecio(row));
     }
   });
 
