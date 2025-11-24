@@ -2,53 +2,70 @@
 {% load static %}
 {% block content %}
 
-<section class="hero d-flex align-items-center justify-content-center text-center">
+<!-- Sección de Bienvenida -->
+<section class="welcome-section py-5">
   <div class="container">
-    <h1 class = "display-3 fw-bold mb-3 d-block">Bienvenido a Tienda Vepa</h1>
-    <!-- Carrusel Bootstrap -->
     <div class="row">
-        <div class="col-md-12 mx-auto">
-            <div id="carouselGaleria" class="carousel slide" data-bs-ride="carousel">
-                <!-- Indicadores -->
-                <div class="carousel-indicators">
-                    {% for imagen in imagenes %}
-                        <button type="button" data-bs-target="#carouselGaleria" 
-                                data-bs-slide-to="{{ forloop.counter0 }}" 
-                                {% if forloop.first %}class="active"{% endif %}
-                                aria-label="Slide {{ forloop.counter }}">
-                        </button>
-                    {% endfor %}
-                </div>
-
-                <!-- Imágenes -->
-                <div class="carousel-inner">
-                    {% for imagen in imagenes %}
-                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                            <img src="{{ imagen.imagen.url }}" class="d-block w-100" 
-                                  alt="{{ imagen.titulo }}" style="max-height: 700px; object-fit: cover;">
-                            <div class="carousel-caption d-none d-md-block">
-                                <h5>{{ imagen.titulo }}</h5>
-                                <p>{{ imagen.descripcion }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Controles -->
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselGaleria" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselGaleria" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
-            </div>
-        </div>
+      <div class="col-12 text-center">
+        <h1 class="display-3 fw-bold mb-4">Bienvenido a Tienda Vepa</h1>
+      </div>
     </div>
   </div>
-<div>
 </section>
-<img src="{% static 'pedidos/images/vepa_bac.jpg' %}" 
-                  alt="Logo Empresarial" 
-                  class="img-fluid mx-auto d-block">
-</div>
+
+<!-- Sección del Carrusel -->
+<section class="carousel-section py-4 py-md-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-lg-8 mx-auto">
+        <div id="carouselGaleria" class="carousel slide" data-bs-ride="carousel">
+          <!-- Indicadores -->
+          <div class="carousel-indicators">
+            {% for imagen in imagenes %}
+              <button type="button" data-bs-target="#carouselGaleria" 
+                      data-bs-slide-to="{{ forloop.counter0 }}" 
+                      {% if forloop.first %}class="active"{% endif %}
+                      aria-label="Slide {{ forloop.counter }}">
+              </button>
+            {% endfor %}
+          </div>
+
+          <!-- Imágenes -->
+          <div class="carousel-inner">
+            {% for imagen in imagenes %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{{ imagen.imagen.url }}" 
+                     class="d-block w-100 carousel-image" 
+                     alt="{{ imagen.titulo }}">                
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Controles -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselGaleria" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselGaleria" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección de Logo -->
+<section class="logo-section py-4 py-md-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <img src="{% static 'pedidos/images/vepa_bac.jpg' %}" 
+             alt="Logo Empresarial" 
+             class="img-fluid mx-auto d-block logo-img">
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

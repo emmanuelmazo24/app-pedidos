@@ -72,3 +72,76 @@ body::before {
         color: white;               /* color del texto mientras parpadea */
     }
 }
+
+/* Sección de Bienvenida */
+/*.welcome-section {
+    background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+}*/
+
+.welcome-section h1 {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    color: #333;
+  }
+
+/* Sección del Carrusel */
+/*.carousel-section {    
+    background: #fafafa;
+}*/
+
+.carousel-image {
+    max-height: clamp(200px, 35vh, 350px);
+    width: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+
+/* Carrusel responsivo */
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+  }
+
+.carousel-caption h5 {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+  }
+
+.carousel-caption p {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+  }
+
+/* Sección de Logo */
+/*.logo-section {
+    background: #ffffff;
+}*/
+
+.logo-img {
+    max-width: 100%;
+    height: auto;
+  }
+
+/* Márgenes y espacios en dispositivos pequeños */
+@media (max-width: 576px) {
+    .welcome-section {
+        padding: 2rem 1rem !important;
+    }
+
+    .carousel-section {
+        padding: 1rem 0 !important;
+    }
+
+    .carousel-caption {
+        padding: 0.5rem;
+    }
+}
+
+  /* Márgenes en dispositivos medianos y grandes */
+@media (min-width: 768px) {
+    .welcome-section {
+      padding: 3rem 0;
+    }
+
+    .carousel-section {
+      padding: 2rem 0;
+    }
+}
