@@ -9,6 +9,10 @@ CALIDAD_CHOICES = [('ECONOMICA','ECONOMICA'),
                     ('PREMIUM','PREMIUM'),
                     ('SUPER PREMIUM','SUPER PREMIUM'),]
 
+TIPO_PERSONA = [('NIÑOS','NIÑOS'),
+                ('ADULTOS','ADULTOS')]
+
+
 CUELLO_CHOICES = [('REDONDO','REDONDO'),
                   ('TIPO V','TIPO V')]
 
@@ -22,7 +26,8 @@ INDUMENTARIA_CHOICES = [('EQUIPO COMPLETO','EQUIPO COMPLETO'),
                     ('MEDIA SOLA','MEDIA SOLA'),
                     ('SHORT SOLA','SHORT SOLA')]
 
-TALLE_CHOICES = [('TALLE 4','TALLE 4'),
+TALLE_CHOICES = [('TALLE 2','TALLE 2'),
+                 ('TALLE 4','TALLE 4'),
                  ('TALLE 6','TALLE 6'),
                  ('TALLE 8','TALLE 8'),
                  ('TALLE 10','TALLE 10'),
@@ -121,6 +126,7 @@ class Pedidos_detalle(models.Model):
 class PreciosIndumentaria(models.Model):
     calidad = models.CharField(max_length=20,choices=CALIDAD_CHOICES)
     indumentaria = models.CharField(max_length=20,choices=INDUMENTARIA_CHOICES)
+    tipo_persona = models.CharField(max_length=20,choices=TIPO_PERSONA, default='ADULTOS')
     precio_unitario = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)

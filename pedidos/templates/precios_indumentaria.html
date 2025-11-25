@@ -29,9 +29,10 @@
     <!-- Encabezado de la tabla -->
     <div class="row bg-success fw-bold py-2 border-bottom">
       <div class="col-sm-3"><strong>Calidad</strong></div>  
-      <div class="col-sm-3"><strong>Tipo</strong></div>     
-      <div class="col-sm-3"><strong>Precio</strong></div>
-      <div class="col-sm-3"></div>    
+      <div class="col-sm-3"><strong>Indumentaria</strong></div>     
+      <div class="col-sm-3"><strong>Tipo</strong></div>  
+      <div class="col-sm-2"><strong>Precio</strong></div>
+      <div class="col-sm-1"></div>    
     </div>
     
     <!-- Fila de datos -->
@@ -39,8 +40,9 @@
     <div class="row py-2 border-bottom bg-light">
       <div class="col-sm-3">{{ precio.calidad}}</div>
       <div class="col-sm-3">{{ precio.indumentaria}}</div>
-      <div class="col-sm-3">{{ precio.precio_unitario|intcomma}}</div> 
-      <div class="col-sm-3">
+      <div class="col-sm-3">{{ precio.tipo_persona}}</div>
+      <div class="col-sm-2">{{ precio.precio_unitario|intcomma}}</div> 
+      <div class="col-sm-1">
         <a href="{% url 'precio_indumentaria_edit' precio.id %}"><ion-icon name="create-outline"></a>
         <a href="{% url 'del_precio' precio.id %}"></ion-icon><ion-icon name="trash-outline"></ion-icon></a>
       </div>        

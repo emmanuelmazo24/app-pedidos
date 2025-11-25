@@ -200,9 +200,20 @@ def crear_pedidos(request):
             pedidosDetalle = formset.save(commit=False)
             total_aprobado = 0            
             #un nuevo comentario
+            lis_indumentaria_remera = ['EQUIPO COMPLETO','CAMISETA SOLA']
+            lis_indumentaria_short = ['SHORT SOLA']
             for detalle in pedidosDetalle:
                 detalle.pedido = pedidos
-                precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
+                if "talle" in detalle.talle.lower():
+                  tipo_persona = 'NIÑOS'
+                else:
+                  tipo_persona = 'ADULTOS'
+                precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad, tipo_persona = tipo_persona).precio_unitario
+                if detalle.talle in ['XL','XXL','3XL']:
+                  if detalle.indumentaria in lis_indumentaria_remera:
+                      precio = precio + 10000
+                  if detalle.indumentaria in lis_indumentaria_short:
+                      precio = precio + 5000
                 detalle.precio_aprobado = precio
                 detalle.save()
                 total_aprobado += precio
@@ -279,10 +290,21 @@ def pedidos_detalle(request, pedido_id):
           # Guardar los detalles del pedido
           pedidosDetalle = formset.save(commit=False)
           #print(pedidosDetalle)
+          lis_indumentaria_remera = ['EQUIPO COMPLETO','CAMISETA SOLA']
+          lis_indumentaria_short = ['SHORT SOLA']
           for detalle in pedidosDetalle:  
               #print('actualiza detalle')              
               detalle.pedido = pedido
-              precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad).precio_unitario
+              if "talle" in detalle.talle.lower():
+                  tipo_persona = 'NIÑOS'
+              else:
+                  tipo_persona = 'ADULTOS'
+              precio = PreciosIndumentaria.objects.get(indumentaria=detalle.indumentaria, calidad=detalle.calidad, tipo_persona = tipo_persona).precio_unitario
+              if detalle.talle in ['XL','XXL','3XL']:
+                if detalle.indumentaria in lis_indumentaria_remera:
+                  precio = precio + 10000
+                if detalle.indumentaria in lis_indumentaria_short:
+                  precio = precio + 5000
               detalle.precio_aprobado = precio
               detalle.save()                
 
@@ -371,8 +393,14 @@ def obtener_precio(request):
     talle = request.GET.get('talle')
     lis_indumentaria_remera = ['EQUIPO COMPLETO','CAMISETA SOLA']
     lis_indumentaria_short = ['SHORT SOLA']
+    
     try:
-        precio = PreciosIndumentaria.objects.get(indumentaria=indumentaria, calidad=calidad).precio_unitario
+        if "talle" in talle.lower():
+            tipo_persona = 'NIÑOS'
+        else:
+            tipo_persona = 'ADULTOS'
+
+        precio = PreciosIndumentaria.objects.get(indumentaria=indumentaria, calidad=calidad, tipo_persona = tipo_persona).precio_unitario
         if talle in ['XL','XXL','3XL']:
             if indumentaria in lis_indumentaria_remera:
                 precio = precio + 10000

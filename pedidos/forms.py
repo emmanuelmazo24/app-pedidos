@@ -129,12 +129,14 @@ class PedidosDetalleForm(ModelForm):
 class PreciosIndumentariaForm(ModelForm):
     class Meta:
         model = PreciosIndumentaria
-        fields = ['calidad','indumentaria','precio_unitario']
+        fields = ['calidad','indumentaria','tipo_persona','precio_unitario']
         Labels = {'calidad': 'Calidad',
                   'indumentaria': 'Indumentaria',
+                  'tipo_persona': 'Tipo',
                   'precio_unitario': 'Precio Unitario'}
         widgers = {'calidad': forms.Select(),
                     'indumentaria': forms.Select(),
+                    'tipo_persona': forms.Select(),
                     'precio_unitario': forms.NumberInput()}
 
 class MiCambioPasswordForm(forms.Form):

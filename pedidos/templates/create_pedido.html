@@ -178,7 +178,7 @@
     const calidad = row.querySelector('[name$="-calidad"]').value;
     const talle = row.querySelector('[name$="-talle"]').value;
     const precioInput = row.querySelector('[name$="-precio_aprobado"]');
-    if (indumentaria && calidad) {
+    if (indumentaria && calidad && talle) {
       fetch(`/obtener_precio/?indumentaria=${encodeURIComponent(indumentaria)}&calidad=${encodeURIComponent(calidad)}&talle=${encodeURIComponent(talle)}`)
         .then(response => response.json())
         .then(data => {          

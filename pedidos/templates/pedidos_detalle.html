@@ -178,9 +178,10 @@
   function actualizarPrecio(row) {
     const indumentaria = row.querySelector('[name$="-indumentaria"]').value;
     const calidad = row.querySelector('[name$="-calidad"]').value;
+    const talle = row.querySelector('[name$="-talle"]').value;
     const precioInput = row.querySelector('[name$="-precio_aprobado"]');
-    if (indumentaria && calidad) {
-      fetch(`/obtener_precio/?indumentaria=${encodeURIComponent(indumentaria)}&calidad=${encodeURIComponent(calidad)}`)
+    if (indumentaria && calidad && talle) {
+      fetch(`/obtener_precio/?indumentaria=${encodeURIComponent(indumentaria)}&calidad=${encodeURIComponent(calidad)}&talle=${encodeURIComponent(talle)}`)
         .then(response => response.json())
         .then(data => {          
           const precioFormateado = parseFloat(data.precio).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -194,9 +195,11 @@
   document.querySelectorAll('.formset-row').forEach(row => {
     const indumentariaSelect = row.querySelector('[name$="-indumentaria"]');
     const calidadSelect = row.querySelector('[name$="-calidad"]');
-    if (indumentariaSelect && calidadSelect) {
+    const talleSelect = row.querySelector('[name$="-talle"]');
+    if (indumentariaSelect && calidadSelect && talleSelect) {
       indumentariaSelect.addEventListener('change', () => actualizarPrecio(row));
       calidadSelect.addEventListener('change', () => actualizarPrecio(row));
+      talleSelect.addEventListener('change', () => actualizarPrecio(row));
     }
   });
 
