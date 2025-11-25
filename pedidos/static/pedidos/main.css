@@ -89,7 +89,7 @@ body::before {
 }*/
 
 .carousel-image {
-    max-height: clamp(200px, 35vh, 350px);
+    max-height: clamp(300px, 50vh, 500px);
     width: auto;
     object-fit: contain;
     display: block;

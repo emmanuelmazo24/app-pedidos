@@ -22,7 +22,14 @@ INDUMENTARIA_CHOICES = [('EQUIPO COMPLETO','EQUIPO COMPLETO'),
                     ('MEDIA SOLA','MEDIA SOLA'),
                     ('SHORT SOLA','SHORT SOLA')]
 
-TALLE_CHOICES = [('PP','PP'),
+TALLE_CHOICES = [('TALLE 4','TALLE 4'),
+                 ('TALLE 6','TALLE 6'),
+                 ('TALLE 8','TALLE 8'),
+                 ('TALLE 10','TALLE 10'),
+                 ('TALLE 12','TALLE 12'),
+                 ('TALLE 14','TALLE 14'),
+                 ('TALLE 16','TALLE 16'),                
+                 ('PP','PP'),
                  ('S','S'),
                  ('M','M'),
                  ('L','L'),
@@ -97,7 +104,7 @@ class Pedidos_imagen(models.Model):
 class Pedidos_detalle(models.Model):
     pedido = models.ForeignKey(Pedidos, on_delete=models.CASCADE,related_name='detalles')
     nombre = models.CharField(max_length=100)
-    talle = models.CharField(max_length=3,choices=TALLE_CHOICES)
+    talle = models.CharField(max_length=10,choices=TALLE_CHOICES)
     dorsal = models.IntegerField(null=False)
     molde = models.CharField(max_length=15,choices=MOLDE_CHOICES)
     cuello_tipo = models.CharField(max_length=50,choices=CUELLO_CHOICES)
