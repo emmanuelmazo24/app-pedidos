@@ -894,3 +894,5 @@ urlpatterns = [
     <i class="fas fa-download"></i> Descargar Detalle
 </a>
 """
+
+waitress-serve --listen=0.0.0.0:8000 myapp.wsgi:application
