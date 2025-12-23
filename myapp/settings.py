@@ -24,7 +24,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -35,7 +34,7 @@ SECRET_KEY = 'django-insecure--c3s1^eg^hiq0loog_(bg&w#sr@e2o5s24yz&cp^=6&o7hulr7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['10.168.106.130']
+ALLOWED_HOSTS = ['10.168.106.130','192.168.24.153','127.0.0.1']
 
 
 # Application definition
@@ -49,8 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'pedidos',
-    'cloudinary',
-    'cloudinary_storage',
     # Aplicaciones de terceros
     'widget_tweaks',
     'galeria',
@@ -64,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # <-- Añadir aquí
 ]
 
 ROOT_URLCONF = 'myapp.urls'
@@ -133,10 +131,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT =  os.path.join(BASE_DIR,STATIC_URL)
+STATIC_URL = '/static/'
+# La carpeta donde Django buscará archivos estáticos adicionales (desarrollo)
+STATICFILES_DIRS = [
+    BASE_DIR / "pedidos/static",
+]
+
+# La carpeta donde se copiarán todos los archivos para PRODUCCIÓN
+# Es aquí donde el servidor web (Nginx/Apache) los buscará
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 LOGIN_URL = '/signin'
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # if not DEBUG:
 #     STATIC_ROOT =  os.path.join(BASE_DIR,'staticfiles')
 #     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

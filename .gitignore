@@ -1,3 +1,4 @@
 db.sqlite3
 app-env
 __pycache__
+staticfiles
